@@ -1,0 +1,48 @@
+#summary Settings class
+#labels Phase-Implementation
+
+= Introduction =
+
+The Settings class is how everything should communicate with stored data.
+
+It has two shortcut functions (`Save` and `Load`) which work on a supplied Object's .data and .option members. It can however deal with any data passed to it in any (Javascript) format, and save or load it cleanly.
+
+As a class all calls are made to Settings.`<method>`
+
+= Details =
+
+These functions should only rarely be called by any Worker.
+
+All data is loaded before any workers get to run.
+
+The main Queue.worker automatically saves data for any workers that .work(). The main() function also saves any data after the .parse() method.
+
+All .option data is saved whenever the options are changed.
+
+= Methods =
+
+== SetValue() / GetValue() ==
+
+`.SetValue('name',value)`
+`.GetValue('name',default)`
+
+These will save or load data under a specific name, which is a subsection of the Greasemonkey storage for the script only.
+
+== Save() / Load() ==
+
+`.Save()`
+`.Save(object)`
+`.Save(type,object)`
+`.Save(type)`
+`.Load()`
+`.Load(object)`
+`.Load(type,object)`
+`.Load(type)`
+
+These two functions rely on an Object having up to three things.
+
+If no 'object' is passed then it iterates through the entire Workers[] array and acts on every one. Any new object of Worker class is automatically added to this array.
+
+If no 'type' value is passed then it defaults to a type of 'data', although it can also use a type of 'option'. These correspond to member variables called .data and .option respectively.
+
+The object must have a member variable called '.name' which is used to further classify the saved / loaded data.
