@@ -7,7 +7,7 @@ The Settings class is how everything should communicate with stored data.
 
 It has two shortcut functions (`Save` and `Load`) which work on a supplied Object's .data and .option members. It can however deal with any data passed to it in any (Javascript) format, and save or load it cleanly.
 
-As a class all calls are made to Settings.&lt;method&gt;
+As a class all calls are made to Settings.`<method>`
 
 = Details =
 
