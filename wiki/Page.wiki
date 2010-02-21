@@ -55,7 +55,7 @@ Checks if the page is currently loading and returns false if not. If it is then 
 
 *NOTE:* You must account for this behaviour in any workers that navigate a site.
 
-== reload() --
+== reload() ==
 
 `Page.reload()`
 
