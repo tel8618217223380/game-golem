@@ -1,0 +1,32 @@
+#summary Worker class for developers.
+#labels Phase-Design,Phase-Implementation
+
+= Introduction =
+
+The Worker class is the workhorse of the script. Everything that happens should be part of a worker - and workers should try not to rely on other workers any more than they really have to.
+
+Workers have a very set flow of how to behave - following this will make debugging easier and reduce later problems...
+
+= Details =
+
+Workers have a number of private functions which anyone can call (but shouldn't unless they know what they're doing), and public functions which should be overloaded as needed. Any "extra" functions can be created, but must not clash with anything else...
+
+== Data and Option ==
+
+myWorker.data and myWorker.option are both saved and loaded automatically. this.option is always available - however this.data is only available in this.parse(), this.work(true), and this.update() - not in this.work(false).
+
+You can set "keep:true" in settings at instance time to ensure it is always available.
+
+= Example =
+
+{{{
+var myWorker = new Worker('myWorker', 'pages', {setting:value});
+
+myWorker.data = {default:value, default2:value2};
+myWorker.option = {default:value, default2:value2};
+
+myWorker.init = function() {
+   // Called after loading - all data is loaded in all workers
+   // Default values are already set
+};
+}}}
