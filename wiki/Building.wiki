@@ -3,7 +3,7 @@
 
 = Introduction =
 
-Simply enough - join all the *.js (except _normal.user.js and _min.user.js) files together in the order given.
+Simply enough - join all the `*`.js (except _normal.user.js and _min.user.js) files together in the order given.
 
 
 = Details =
