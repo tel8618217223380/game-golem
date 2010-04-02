@@ -26,8 +26,8 @@ If your worker is never going to need stored data or options then make them equa
 {{{
 var myWorker = new Worker('myWorker', '*', {});
 
-myWorker.data = {};
-myWorker.option = {};
+myWorker.data = {}; // May be null if we never use it
+myWorker.option = {}; // May be null if we never use it
 
 myWorker.init = function() {
 };
