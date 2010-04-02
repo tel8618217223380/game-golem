@@ -1,0 +1,19 @@
+#summary Installation Instructions.
+#labels Phase-Deploy,Featured
+
+[http://userscripts.org/scripts/show/67412 User Home Page]
+
+[http://code.google.com/p/game-golem/ Developer Home Page] (or click Project Home above)
+
+= Releases =
+
+The latest Official Release. These are normally stable and have no important bugs (though some occasionally slip through).
+
+[http://userscripts.org/scripts/source/67412.user.js Official Release]
+
+= Work in Progress =
+
+*NOTE:* This is the Work in Progress version, which means there are quite often extra bugs while we're working on things - check the [http://code.google.com/p/game-golem/source/list Changelog] for details.
+
+  * [http://game-golem.googlecode.com/svn/trunk/_min.user.js Minified] (unreadable, only used to run it)
+  * [http://game-golem.googlecode.com/svn/trunk/_normal.user.js Normal] (readable, used to edit)
