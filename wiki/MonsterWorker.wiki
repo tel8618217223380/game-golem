@@ -1,0 +1,15 @@
+#Monster Worker Users Page
+
+= Introduction =
+
+The Monster Worker is a portion of the Golem that handles stamina usage for both Monsters and Raids.
+
+
+= Fortification =
+
+= Who to Fight =
+
+= Raids =
+
+= Siege Assist Options =
+
