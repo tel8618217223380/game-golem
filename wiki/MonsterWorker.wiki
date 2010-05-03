@@ -5,7 +5,7 @@ The Monster Worker is a portion of the Golem that handles stamina usage for both
 
 
 == Fortification ==
-===Fortify Below ===
+=== Fortify Below ===
 This option will determine when the Monster Worker spends energy on fortification.
 Worker checks the level of Fortify / Dispel and if it is below the set %, worker will spend energy on Fortifying / Dispeling.
 == Who to Fight ==
@@ -13,4 +13,3 @@ Worker checks the level of Fortify / Dispel and if it is below the set %, worker
 == Raids ==
 
 == Siege Assist Options ==
-
