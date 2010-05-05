@@ -471,8 +471,11 @@ Monster.parse = function(change) {
 			monster.damage_total = 0;
 			monster.damage = {};
 			$('td.dragonContainer table table a[href^="http://apps.facebook.com/castle_age/keep.php?user="]').each(function(i,el){
-				var user = $(el).attr('href').regex(/user=([0-9]+)/i), tmp = $(el).parent().next().text().replace(/[^0-9\/]/g,''), dmg = tmp.regex(/([0-9]+)/), fort = tmp.regex(/\/([0-9]+)/);
-				monster.damage[user]  = (fort ? [dmg, fort] : [dmg]);
+				var user = $(el).attr('href').regex(/user=([0-9]+)/i), tmp = $(el).parent().parent().next().text().replace(/[^0-9\/]/g,''), dmg = tmp.regex(/([0-9]+)/), fort = tmp.regex(/\/([0-9]+)/);
+				if (monster.raid){
+                                    tmp = $(el).parent().next().text().replace(/[^0-9\/]/g,''), dmg = tmp.regex(/([0-9]+)/), fort = tmp.regex(/\/([0-9]+)/);
+                                }
+                                monster.damage[user]  = (fort ? [dmg, fort] : [dmg]);
 				monster.damage_total += dmg;
 			});
 			monster.dps = monster.damage_total / (timer - monster.timer);
@@ -706,8 +709,9 @@ Monster.work = function(state) {
 	}
         /* Trying to find element of image following CTA button
          *
-         *debug('Monster: Current Siege Phase is: '+ $('input[title*="help with"]').next('title*="Construct"').attr('title').regex(/ (.*)/i));
-	*/
+         */
+        //debug('Monster: Current Siege Phase is: '+ $('img[title*="construct"]').attr('title')/*.title().regex(/ (.*)/i)*/);
+	
         if (this.option.assist && typeof $('input[name*="help with"]') !== 'undefined' && (typeof this.data[uid][type].phase === 'undefined' || $('input[name*="help with"]').attr('title').regex(/ (.*)/i) !== this.data[uid][type].phase)){
 		debug('Monster: Current Siege Phase is: '+ $('input[name*="help with"]').attr('title').regex(/ (.*)/i));
                 this.data[uid][type].phase = $('input[name*="help with"]').attr('title').regex(/ (.*)/i);

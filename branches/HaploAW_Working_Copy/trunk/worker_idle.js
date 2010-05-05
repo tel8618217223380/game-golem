@@ -16,8 +16,7 @@ Idle.option = {
 	town: 'Never',
 	battle: 'Quarterly',
 	monsters: 'Hourly',
-        collect: 'false'
-	
+        collect: 'Never'	
 };
 
 Idle.when = ['Never', 'Quarterly', 'Hourly', '2 Hours', '6 Hours', '12 Hours', 'Daily', 'Weekly'];
@@ -72,7 +71,7 @@ Idle.work = function(state) {
 		town:['town_soldiers', 'town_blacksmith', 'town_magic', 'town_land'],
 		battle:['battle_battle'], //, 'battle_arena'
 		monsters:['keep_monster', 'battle_raid'],
-                apprentice:['apprentice_collect']
+                collect:['apprentice_collect']
 	}, when = { 'Never':0, 'Quarterly':900000, 'Hourly':3600000, '2 Hours':7200000, '6 Hours':21600000, '12 Hours':43200000, 'Daily':86400000, 'Weekly':604800000 };
 	if (!Generals.to(this.option.general)) {
 		return true;

@@ -75,7 +75,7 @@ Page.defaults = {
 			army_sentinvites:		{url:'army_reqs.php', image:'sent_invites_on.gif'},
 			army_newsfeed:			{url:'army_news_feed.php', selector:'#app'+APPID+'_army_feed_header'},
                         apprentice:                     {url:'apprentice.php', image:'ma_main_learn_more.jpg'},
-                        apprentice_collect:             {url:'apprentice.php?collect=true', image:'ma_view_progress_main.gif'}
+                        apprentice_collect:             {url:'apprentice.php?collect=true', selector:'div[style*="ma_view_progress_main.gif"]'}
 		}
 	}
 };
@@ -197,8 +197,6 @@ Page.to = function(page, args, force) {
 		} else {
 			this.ajaxload();
 		}
-                //Trying to determine way to see "White Page" after navigation.
-                debug('Page: Locating Cash amount ' + Player.get('cash'));
 	}
 	return false;
 };
