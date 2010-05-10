@@ -4674,7 +4674,8 @@ Monster.types = {
 		dead:'stone_giant_dead.jpg',
 		achievement:20000,
 		timer:259200, // 72 hours
-		mpool:1
+		mpool:1,
+                energy_action:false
 	},
 	gildamesh: {
 		name:'Gildamesh, the Orc King',
@@ -4683,7 +4684,8 @@ Monster.types = {
 		dead:'orc_boss_dead.jpg',
 		achievement:15000,
 		timer:259200, // 72 hours
-		mpool:1
+		mpool:1,
+                energy_action:false
 	},
 	keira: {
 		name:'Keira the Dread Knight',
@@ -4692,7 +4694,8 @@ Monster.types = {
 		dead:'boss_keira_dead.jpg',
 		achievement:30000,
 		timer:172800, // 48 hours
-		mpool:1
+		mpool:1,
+                energy_action:false
 	},
 	lotus: {
 		name:'Lotus Ravenmoore',
@@ -4701,7 +4704,8 @@ Monster.types = {
 		dead:'boss_lotus_big_dead.jpg',
 		achievement:500000,
 		timer:172800, // 48 hours
-		mpool:1		
+		mpool:1,
+                energy_action:false
 	},
 	mephistopheles: {
 		name:'Mephistopheles',
@@ -4710,7 +4714,8 @@ Monster.types = {
 		dead:'boss_mephistopheles_dead.jpg',
 		achievement:100000,
 		timer:172800, // 48 hours
-		mpool:1		
+		mpool:1,
+                energy_action:false
 	},
 	skaar: {
 		name:'Skaar Deathrune',
@@ -4719,7 +4724,8 @@ Monster.types = {
 		dead:'death_dead.jpg',
 		achievement:1000000,
 		timer:345000, // 95 hours, 50 minutes
-		mpool:1		
+		mpool:1,
+                energy_action:true
 	},
 	sylvanus: {
 		name:'Sylvana the Sorceress Queen',
@@ -4728,7 +4734,8 @@ Monster.types = {
 		dead:'boss_sylvanus_dead.jpg',
 		achievement:50000,
 		timer:172800, // 48 hours
-		mpool:1		
+		mpool:1,
+                energy_action:false
 	},
 	// Epic Team
 	dragon_emerald: {
@@ -4738,7 +4745,8 @@ Monster.types = {
 		dead:'dead_dragon_image_green.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	dragon_frost: {
 		name:'Frost Dragon',
@@ -4747,7 +4755,8 @@ Monster.types = {
 		dead:'dead_dragon_image_blue.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	dragon_gold: {
 		name:'Gold Dragon',
@@ -4756,7 +4765,8 @@ Monster.types = {
 		dead:'dead_dragon_image_gold.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	dragon_red: {
 		name:'Ancient Red Dragon',
@@ -4765,7 +4775,8 @@ Monster.types = {
 		dead:'dead_dragon_image_red.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	serpent_amethyst: { // DEAD image ???
 		name:'Amethyst Sea Serpent',
@@ -4774,7 +4785,8 @@ Monster.types = {
 		//dead:'seamonster_dead.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	serpent_ancient: { // DEAD image ???
 		name:'Ancient Sea Serpent',
@@ -4783,7 +4795,8 @@ Monster.types = {
 		//dead:'seamonster_dead.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	serpent_emerald: { // DEAD image ???
 		name:'Emerald Sea Serpent',
@@ -4792,7 +4805,8 @@ Monster.types = {
 		//dead:'seamonster_dead.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	serpent_sapphire: { // DEAD image ???
 		name:'Sapphire Sea Serpent',
@@ -4801,7 +4815,8 @@ Monster.types = {
 		//dead:'seamonster_dead.jpg',
 		achievement:100000,
 		timer:259200, // 72 hours
-		mpool:2		
+		mpool:2,
+                energy_action:false
 	},
 	// Epic World
 	cronus: {
@@ -4811,7 +4826,8 @@ Monster.types = {
 		dead:'hydra_dead.jpg',
 		achievement:500000,
 		timer:604800, // 168 hours
-		mpool:3		
+		mpool:3,
+                energy_action:false
 	},
 	legion: {
 		name:'Battle of the Dark Legion',
@@ -4820,7 +4836,8 @@ Monster.types = {
 		dead:'castle_siege_dead.jpg',
 		achievement:1000,
 		timer:604800, // 168 hours
-		mpool:3		
+		mpool:3,
+                energy_action:true
 	},
 	genesis: {
 		name:'Genesis, The Earth Elemental',
@@ -4829,7 +4846,8 @@ Monster.types = {
 		dead:'earth_element_dead.jpg',
 		achievement:1000000,
 		timer:604800, // 168 hours
-		mpool:3		
+		mpool:3,
+                energy_action:true
 	},
 	ragnarok: {
 		name:'Ragnarok, The Ice Elemental',
@@ -4838,7 +4856,8 @@ Monster.types = {
 		dead:'water_dead.jpg',
 		achievement:1000000,
 		timer:604800, // 168 hours
-		mpool:3		
+		mpool:3,
+                energy_action:true
 	},
 	bahamut: {
 		name:'Bahamut, the Volcanic Dragon',
@@ -4847,7 +4866,8 @@ Monster.types = {
 		dead:'nm_volcanic_dead.jpg',
 		achievement:1000000, // Guesswork
 		timer:604800, // 168 hours
-		mpool:3	
+		mpool:3,
+                energy_action:true
 	}
 };
 
@@ -5241,20 +5261,7 @@ Monster.work = function(state) {
 				break;
 		}
 	} else {
-                
-                if (!this.runtime.monster_btn){
-                    this.runtime.monster_btn['monster'] = type;
-                    this.runtime.monster_btn[type]['id'] = 0;
-                    debug(this.name,'Setting monster type to ' + type);
-                }
-                for (i=0; i<this.runtime['monster_btn'].length; i++) {
-                    debug(this.name,'Monster Button Length =' + this.runtime['monster_btn'].length);
-                    if (this.runtime['monster_btn'] === type){
-                      debug(this.name,'Found monster type of ' + this.runtime['monster_btn']);
-                }
-                }
-                /*
-                 *if(this.data[uid][type].button_fail <= 5 || !this.data[uid][type].button_fail){
+		if(this.data[uid][type].button_fail <= 5 || !this.data[uid][type].button_fail){
                     //Primary method of finding button.
                     //debug(this.name,"Setting Primary button location.");
                     j = (this.runtime.fortify && Queue.burn.energy >= 10) ? 'fortify' : 'attack';
@@ -5284,7 +5291,6 @@ Monster.work = function(state) {
                     log(this.name,'Ignoring Monster ' + this.data[uid][type].name + '\'s ' + this.types[type].name + this.data[uid][type] + ': Unable to locate ' + j + ' button ' + this.data[uid][type].button_fail + ' times!');
                     this.data[uid][type].ignore = true;
                     this.data[uid][type].button_fail = 0;}
-               */
 	}
 	if (!btn || !btn.length || (Page.page !== 'keep_monster_active' && Page.page !== 'keep_monster_active2') || ($('div[style*="dragon_title_owner"] img[linked]').attr('uid') != uid && $('div[style*="nm_top"] img[linked]').attr('uid') != uid)) {
 /*		debug(this.name,'Reloading page. Button = ' + btn.attr('name'));
@@ -5294,10 +5300,6 @@ Monster.work = function(state) {
 		Page.to(this.types[type].raid ? 'battle_raid' : 'keep_monster', '?user=' + uid + (this.types[type].mpool ? '&mpool='+this.types[type].mpool : ''));
 		return true; // Reload if we can't find the button or we're on the wrong page
 	}
-        /*
-        tmp =  $('input[alt="ask for help"]').next('.image');
-        debug(this.name,'New Siege locator: ' + tmp.attr('title').regex(/(.*)/i));
-	*/
         if (this.option.assist && typeof $('input[name*="help with"]') !== 'undefined' && (typeof this.data[uid][type].phase === 'undefined' || $('input[name*="help with"]').attr('title').regex(/ (.*)/i) !== this.data[uid][type].phase)){
 		debug(this.name,'Current Siege Phase is: '+ this.data[uid][type].phase);
 		this.data[uid][type].phase = $('input[name*="help with"]').attr('title').regex(/ (.*)/i);
