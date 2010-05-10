@@ -138,7 +138,7 @@ var sum = function (a) { // Adds the values of all array entries together
 	var i, t = 0;
 	if (isArray(a)) {
 		for(i=0; i<a.length; i++) {
-			t += sum(a[i]);
+			t += sum(a[i] || 0);
 		}
 	} else if (typeof a === 'object') {
 		for(i in a) {
@@ -223,7 +223,7 @@ var getAttDef = function(list, unitfunc, x, count, user) { // Find total att(ack
 		own = typeof list[units[i]].own === 'number' ? list[units[i]].own : 1;
 		if (user) {
 			if (Math.min(count, own) > 0) {
-//				debug('Using: '+Math.min(count, own)+' x '+units[i]+' = '+JSON.stringify(list[units[i]]));
+//				debug('Utility','Using: '+Math.min(count, own)+' x '+units[i]+' = '+JSON.stringify(list[units[i]]));
 				if (!list[units[i]].use) {
 					list[units[i]].use = {};
 				}
@@ -350,3 +350,6 @@ Date.replaceChars = {
 	U: function() { return this.getTime() / 1000; }
 };
 
+var iscaap = function() {
+	return (typeof caap != 'undefined');
+};

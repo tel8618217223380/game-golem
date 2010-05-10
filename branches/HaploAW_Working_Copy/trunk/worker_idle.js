@@ -16,7 +16,7 @@ Idle.option = {
 	town: 'Never',
 	battle: 'Quarterly',
 	monsters: 'Hourly',
-        collect: 'Never'	
+        collect: 'Never'
 };
 
 Idle.when = ['Never', 'Quarterly', 'Hourly', '2 Hours', '6 Hours', '12 Hours', 'Daily', 'Weekly'];
@@ -57,7 +57,7 @@ Idle.display = [
                 id:'collect',
                 label:'Apprentice Reward',
                 select:Idle.when
-        }
+	}
 ];
 
 Idle.work = function(state) {

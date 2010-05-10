@@ -44,11 +44,13 @@ if (window.location.hostname === 'apps.facebook.com' || window.location.hostname
 	}
 }
 
-var log = console.log;
+var log = function(worker,txt){
+    console.log('[' + (new Date()).format('G:i:s') + '] ' + worker + ': ' + txt);
+}
 
 if (show_debug) {
-	var debug = function(txt) {
-		console.log('[' + (new Date()).format('G:i:s') + '] ' + txt);
+	var debug = function(worker, txt) {
+		console.log('[' + (new Date()).format('G:i:s') + '] ' + worker + ': ' + txt);
 	};
 } else {
 	var debug = function(){};
@@ -314,7 +316,7 @@ var sum = function (a) { // Adds the values of all array entries together
 	var i, t = 0;
 	if (isArray(a)) {
 		for(i=0; i<a.length; i++) {
-			t += sum(a[i]);
+			t += sum(a[i] || 0);
 		}
 	} else if (typeof a === 'object') {
 		for(i in a) {
@@ -399,7 +401,7 @@ var getAttDef = function(list, unitfunc, x, count, user) { // Find total att(ack
 		own = typeof list[units[i]].own === 'number' ? list[units[i]].own : 1;
 		if (user) {
 			if (Math.min(count, own) > 0) {
-//				debug('Using: '+Math.min(count, own)+' x '+units[i]+' = '+JSON.stringify(list[units[i]]));
+//				debug('Utility','Using: '+Math.min(count, own)+' x '+units[i]+' = '+JSON.stringify(list[units[i]]));
 				if (!list[units[i]].use) {
 					list[units[i]].use = {};
 				}
@@ -526,6 +528,9 @@ Date.replaceChars = {
 	U: function() { return this.getTime() / 1000; }
 };
 
+var iscaap = function() {
+	return (typeof caap != 'undefined');
+};
 /* Worker Prototype
    ----------------
 new Worker(name, pages, settings)
@@ -909,7 +914,7 @@ refreshPositions:true, stop:function(){Config.updateOptions();} })
 					k.settings.after = k.settings.after || [];
 					k.settings.after.push(Workers[i].name);
 					k.settings.after = unique(k.settings.after);
-//					debug('Pushing '+k.name+' after '+Workers[i].name+' = '+k.settings.after);
+//					debug(this.name,'Pushing '+k.name+' after '+Workers[i].name+' = '+k.settings.after);
 				}
 			}
 		}
@@ -920,7 +925,7 @@ refreshPositions:true, stop:function(){Config.updateOptions();} })
 					k.settings.before = k.settings.before || [];
 					k.settings.before.push(Workers[i].name);
 					k.settings.before = unique(k.settings.before);
-//					debug('Pushing '+k.name+' before '+Workers[i].name+' = '+k.settings.before);
+//					debug(this.name,'Pushing '+k.name+' before '+Workers[i].name+' = '+k.settings.before);
 				}
 			}
 		}
@@ -1150,7 +1155,7 @@ Config.set = function(key, value) {
 };
 
 Config.updateOptions = function() {
-//	debug('Options changed');
+//	debug(this.name,'Options changed');
 	// Get order of panels first
 	Queue.option.queue = this.getOrder();
 	// Now can we see the advanced stuff
@@ -1178,7 +1183,7 @@ Config.updateOptions = function() {
 			try {
 				WorkerByName(tmp[0]).set('option.'+tmp[1], val);
 			} catch(e) {
-				debug(e.name + ' in Config.updateOptions(): ' + $(el).attr('id') + '(' + JSON.stringify(tmp) + ') = ' + e.message);
+				debug(this.name,e.name + ' in Config.updateOptions(): ' + $(el).attr('id') + '(' + JSON.stringify(tmp) + ') = ' + e.message);
 			}
 		}
 	});
@@ -1302,7 +1307,7 @@ Dashboard.update = function(type) {
 			worker._unflush();
 			worker.dashboard();
 		}catch(e) {
-			debug(e.name + ' in ' + worker.name + '.dashboard(): ' + e.message);
+			log(this.name,e.name + ' in ' + worker.name + '.dashboard(): ' + e.message);
 		}
 	} else {
 		$('#'+id).empty();
@@ -1405,8 +1410,7 @@ Page.defaults = {
 			army_viewarmy:			{url:'army_member.php', image:'view_army_on.gif'},
 			army_sentinvites:		{url:'army_reqs.php', image:'sent_invites_on.gif'},
 			army_newsfeed:			{url:'army_news_feed.php', selector:'#app'+APPID+'_army_feed_header'},
-                        apprentice:                     {url:'apprentice.php', image:'ma_main_learn_more.jpg'},
-                        apprentice_collect:             {url:'apprentice.php?collect=true', selector:'div[style*="ma_view_progress_main.gif"]'}
+                        apprentice_collect:             {url:'apprentice.php?collect=true', image:'ma_view_progress2.gif'}
 		}
 	}
 };
@@ -1497,13 +1501,13 @@ Page.identify = function() {
 	if (this.page !== '') {
 		this.data[this.page] = Date.now();
 	}
-//	debug('this.identify("'+Page.page+'")');
+	//debug(this.name,'this.identify("'+Page.page+'")');
 	return this.page;
 };
 
 Page.to = function(page, args, force) {
 	if (Queue.option.pause) {
-		debug('Trying to load page when paused...');
+		debug(this.name,'Trying to load page when paused...');
 		return true;
 	}
 	if (page === this.page && (force || typeof args === 'undefined')) {
@@ -1521,13 +1525,13 @@ Page.to = function(page, args, force) {
 		} else {
 			this.last = this.last + args;
 		}
-		debug('Navigating to ' + page + ' (' + (force ? 'FORCE: ' : '') + this.last + ')');
+		debug(this.name,'Navigating to ' + page + ' (' + (force ? 'FORCE: ' : '') + this.last + ')');
 		if (force) {
 //			this.loading=true;
 			window.location.href = this.last;
 		} else {
 			this.ajaxload();
-		}
+		}               
 	}
 	return false;
 };
@@ -1543,8 +1547,7 @@ Page.ajaxload = function() {
 			Page.ajaxload();
 		},
 		success:function(data){
-//		if (data.indexOf('</html>') !== -1 && data.indexOf('single_popup') !== -1 && data.indexOf('app'+APPID+'_index') !== -1) { // Last things in source if loaded correctly...
-		if (data.indexOf('app'+APPID+'_results_container') !== -1){
+		if (data.indexOf('app'+APPID+'_results_container') !== -1 && data.indexOf('</html>') !== -1 && data.indexOf('single_popup') !== -1 && data.indexOf('app'+APPID+'_index') !== -1) { // Last things in source if loaded correctly...
 				Page.loading = false;
 				data = data.substring(data.indexOf('<div id="app'+APPID+'_globalContainer"'), data.indexOf('<div class="UIStandardFrame_SidebarAds"'));
 				$('#app'+APPID+'_AjaxLoadIcon').css('display', 'none');
@@ -1560,13 +1563,13 @@ Page.ajaxload = function() {
 };
 
 Page.reload = function() {
-	debug('Page.reload()');
+	debug(this.name,'Page.reload()');
 	window.location.href = window.location.href;
 };
 
 Page.click = function(el) {
 	if (!$(el).length) {
-		debug('Page.click: Unable to find element - '+el);
+		log(this.name,'Page.click: Unable to find element - '+el);
 		return false;
 	}
 	var e = document.createEvent("MouseEvents");
@@ -1663,7 +1666,7 @@ Queue.init = function() {
 	this.option.queue = unique(this.option.queue);
 	for (i in Workers) {// Add any new workers that have a display (ie, sortable)
 		if (Workers[i].work && Workers[i].display && !findInArray(this.option.queue, Workers[i].name)) {
-			log('Adding '+Workers[i].name+' to Queue');
+			log(this.name,'Adding '+Workers[i].name+' to Queue');
 			if (Workers[i].settings.unsortable) {
 				this.option.queue.unshift(Workers[i].name);
 			} else {
@@ -1675,7 +1678,7 @@ Queue.init = function() {
 		worker = WorkerByName(this.option.queue[i]);
 		if (worker && worker.id) {
 			if (this.runtime.current && worker.name === this.runtime.current) {
-				debug('Queue: Trigger '+worker.name+' (continue after load)');
+				debug(this.name,'Trigger '+worker.name+' (continue after load)');
 				$('#'+worker.id+' > h3').css('font-weight', 'bold');
 			}
 			$('#golem_config').append($('#'+worker.id));
@@ -1686,7 +1689,7 @@ Queue.init = function() {
 	Queue.lastpause = this.option.pause;
 	$btn = $('<img class="golem-button' + (this.option.pause?' red':'') + '" id="golem_pause" src="' + (this.option.pause?play:pause) + '">').click(function() {
 		Queue.option.pause ^= true;
-		debug('State: '+((Queue.option.pause)?"paused":"running"));
+		debug('Queue','State: '+((Queue.option.pause)?"paused":"running"));
 		$(this).toggleClass('red').attr('src', (Queue.option.pause?play:pause));
 		Page.clear();
 		Config.updateOptions();
@@ -1715,7 +1718,7 @@ Queue.run = function() {
 	if (Page.loading) {
 		return; // We want to wait xx seconds after the page has loaded
 	}
-//	debug('Start Queue');
+//	debug(this.name,'Start Queue');
 	this.burn.stamina = this.burn.energy = 0;
 	if (this.option.burn_stamina || Player.get('stamina') >= this.option.start_stamina) {
 		this.burn.stamina = Math.max(0, Player.get('stamina') - this.option.stamina);
@@ -1728,15 +1731,15 @@ Queue.run = function() {
 	// We don't want to stay at max any longer than we have to because it is wasteful.  Burn a bit to start the countdown timer.
 /*	if (Player.get('energy') >= Player.get('maxenergy')){
 		this.burn.stamina = 0;	// Focus on burning energy
-		debug('Queue: At max energy, burning energy first.');
+		debug(this.name,'At max energy, burning energy first.');
 	} else if (Player.get('stamina') >= Player.get('maxstamina')){
 		this.burn.energy = 0;	// Focus on burning stamina
-		debug('Queue: At max stamina, burning stamina first.');
+		debug(this.name,'At max stamina, burning stamina first.');
 	}
 */	
 	for (i=0; i<Workers.length; i++) { // Run any workers that don't have a display, can never get focus!!
 		if (Workers[i].work && !Workers[i].display) {
-//			debug(Workers[i].name + '.work(false);');
+//			debug(this.name,Workers[i].name + '.work(false);');
 			Workers[i]._unflush();
 			Workers[i]._work(false);
 		}
@@ -1746,7 +1749,7 @@ Queue.run = function() {
 		if (!worker || !worker.work || !worker.display) {
 			continue;
 		}
-//		debug(worker.name + '.work(' + (this.runtime.current === worker.name) + ');');
+//		debug(this.name,worker.name + '.work(' + (this.runtime.current === worker.name) + ');');
 		if (this.runtime.current === worker.name) {
 			worker._unflush();
 			result = worker._work(true);
@@ -1758,7 +1761,7 @@ Queue.run = function() {
 			if (worker.id) {
 				$('#'+worker.id+' > h3').css('font-weight', 'normal');
 			}
-			debug('Queue: End '+worker.name);
+			debug(this.name,'End '+worker.name);
 		}
 		if (!result || found) { // We will work(false) everything, but only one gets work(true) at a time
 			continue;
@@ -1768,7 +1771,7 @@ Queue.run = function() {
 			continue;
 		}
 		if (this.runtime.current) {
-			debug('Queue: Interrupt '+this.runtime.current);
+			debug(this.name,'Interrupt '+this.runtime.current);
 			if (WorkerByName(this.runtime.current).id) {
 				$('#'+WorkerByName(this.runtime.current).id+' > h3').css('font-weight', 'normal');
 			}
@@ -1777,9 +1780,9 @@ Queue.run = function() {
 		if (worker.id) {
 			$('#'+worker.id+' > h3').css('font-weight', 'bold');
 		}
-		debug('Queue: Trigger '+worker.name);
+		debug(this.name,'Trigger ' + worker.name);
 	}
-//	debug('End Queue');
+//	debug(this.name,'End Queue');
 	for (i=0; i<Workers.length; i++) {
 		Workers[i]._flush();
 	}
@@ -1845,11 +1848,11 @@ Settings.update = function(type) {
 			case 'None':
 				break;
 			case 'Load':
-				debug('Settings: Loading ' + this.option.which);
+				debug(this.name,'Loading ' + this.option.which);
 				this.get(this.option.which);
 				break;
 			case 'Save':
-				debug('Settings: Saving ' + this.option.name);
+				debug(this.name,'Saving ' + this.option.name);
 				this.set(this.option.name);
 				this.option.which = this.option.name;
 				break;
@@ -1956,14 +1959,14 @@ Update.work = function(state) {
 	if (!this.runtime.found && Date.now() - this.runtime.lastcheck > 21600000) {// 6+ hours since last check (60x60x6x1000ms)
 		this.runtime.lastcheck = Date.now();
 		/*
-		debug('Checking trunk revisions');
+		debug(this.name,'Checking trunk revisions');
 		GM_xmlhttpRequest({ // Cross-site ajax, only via GreaseMonkey currently...
 			method: "GET",
 			url: 'http://code.google.com/p/game-golem/source/browse/#svn/trunk',
 			onload: function(evt) {
 				if (evt.readyState === 4 && evt.status === 200) {
 					var release = evt.responseText.regex(/"_release.user.js":\["[^"]*","([0-9]+)"/i), beta = evt.responseText.regex(/"_normal.user.js":\["[^"]*","([0-9]+)"/i);
-					debug('Version: '+release+', Beta: '+beta);
+					debug(this.name,'Version: '+release+', Beta: '+beta);
 				}
 			}
 		});
@@ -1984,7 +1987,7 @@ Update.work = function(state) {
 							$('#golem_config').after('<div id="golem_request" title="Castle Age Golem"><p>There is a new version of Castle Age Golem available.</p><p>Current&nbsp;version:&nbsp;'+VERSION+', New&nbsp;version:&nbsp;'+remoteVersion+'</p></div>');
 							$('#golem_request').dialog({ modal:true, buttons:{"Install":function(){$(this).dialog("close");window.location.href='http://game-golem.googlecode.com/svn/trunk/_release.user.js';}, "Skip":function(){$(this).dialog("close");}} });
 						}
-						log('New version available: '+remoteVersion);
+						log(this.name,'New version available: '+remoteVersion);
 					} else if (Update.get('runtime.force')) {
 						$('#golem_config').after('<div id="golem_request" title="Castle Age Golem"><p>There are no new versions available.</p></div>');
 						$('#golem_request').dialog({ modal:true, buttons:{"Ok":function(){$(this).dialog("close");}} });
@@ -2097,7 +2100,7 @@ Alchemy.work = function(state) {
 	if (!state || !Page.to('keep_alchemy')) {
 		return true;
 	}
-	debug('Alchemy: Perform - ' + this.runtime.best);
+	debug(this.name,'Perform - ' + this.runtime.best);
 	if (!Page.click($('input[type="image"]', $('div.recipeTitle:contains("' + this.runtime.best + '")').next()))) {
 		Page.reload(); // Can't find the recipe we just parsed when coming here...
 	}
@@ -2410,7 +2413,7 @@ Battle.update = function(type) {
 		}
 	}
 	if (length(this.data.user) > this.option.cache) { // Need to prune our target cache
-//		debug('Battle: Pruning target cache');
+//		debug(this.name,'Pruning target cache');
 		list = [];
 		for (i in data) {
 			list.push(i);
@@ -2503,7 +2506,7 @@ Battle.update = function(type) {
 */
 Battle.work = function(state) {
 	if (!this.runtime.attacking || Player.get('health') < 13 || Queue.burn.stamina < 1) {
-//		debug('Battle: Not attacking because: ' + (this.runtime.attacking ? '' : 'No Target, ') + 'Health: ' + Player.get('health') + ' (must be >=10), Burn Stamina: ' + Queue.burn.stamina + ' (must be >=1)');
+//		debug(this.name,'Not attacking because: ' + (this.runtime.attacking ? '' : 'No Target, ') + 'Health: ' + Player.get('health') + ' (must be >=10), Burn Stamina: ' + Queue.burn.stamina + ' (must be >=1)');
 		return false;
 	}
 	if (!state || (this.option.general && !Generals.to(Generals.best(this.option.type))) || !Page.to('battle_battle')) {
@@ -2511,10 +2514,10 @@ Battle.work = function(state) {
 	}
 	var $form = $('form input[alt="'+this.option.type+'"]').first().parents('form');
 	if (!$form.length) {
-		debug('Battle: Unable to find attack buttons, forcing reload');
+		debug(this.name,'Unable to find attack buttons, forcing reload');
 		Page.to('index');
 	} else {
-		log('Battle: Attacking ' + this.data.user[this.runtime.attacking].name + ' (' + this.runtime.attacking + ')');
+		log(this.name,'Battle: Attacking ' + this.data.user[this.runtime.attacking].name + ' (' + this.runtime.attacking + ')');
 		$('input[name="target_id"]', $form).attr('value', this.runtime.attacking);
 		Page.click($('input[type="image"]', $form));
 	}
@@ -2608,7 +2611,7 @@ Blessing.defaults = {
 
 Blessing.option = {
 	which:'Stamina',
-        display:'False'
+        display: false
 };
 
 Blessing.runtime = {
@@ -2756,7 +2759,7 @@ Elite.parse = function(change) {
 				Elite.data[Elite.runtime.nextarena].arena = Date.now() + 3600000; // 1 hour
 			} else if ($(el).text().match(/YOUR Arena Guard is FULL/i)) {
 				Elite.runtime.waitarena = Date.now();
-				debug('Arena guard full, wait '+Elite.option.every+' hours');
+				debug(this.name,this + 'Arena guard full, wait '+Elite.option.every+' hours');
 			}
 		}
 		if ($(el).text().match(/Elite Guard, and they have joined/i)) {
@@ -2765,7 +2768,7 @@ Elite.parse = function(change) {
 			Elite.data[$('img', el).attr('uid')].elite = Date.now() + 3600000; // 1 hour
 		} else if ($(el).text().match(/YOUR Elite Guard is FULL!/i)) {
 			Elite.runtime.waitelite = Date.now();
-			debug('Elite guard full, wait '+Elite.option.every+' hours');
+			debug(this.name,'Elite guard full, wait '+Elite.option.every+' hours');
 		}
 	});
 	if (Page.page === 'army_viewarmy') {
@@ -2825,7 +2828,7 @@ Elite.work = function(state) {
 	var i, j, found = null;
 	if (Math.ceil((Player.get('armymax') - this.runtime.armyextra - 1) / this.option.armyperpage) > this.runtime.armylastpage) {
 		if (state) {
-			debug('Elite: Filling army list');
+			debug(this.name,'Filling army list');
 			this.runtime.armylastpage = Math.max(this.runtime.armylastpage + 1, Math.ceil((length(this.data) + 1) / this.option.armyperpage));
 			Page.to('army_viewarmy', '?page=' + this.runtime.armylastpage);
 		}
@@ -2841,13 +2844,13 @@ Elite.work = function(state) {
 		return true;
 	}
 	if ((this.runtime.waitelite + (this.option.every * 3600000)) <= Date.now()) {
-		debug('Elite: Add Elite Guard member '+this.runtime.nextelite);
+		debug(this.name,'Add Elite Guard member '+this.runtime.nextelite);
 		if (!Page.to('keep_eliteguard', '?twt=jneg&jneg=true&user=' + this.runtime.nextelite)) {
 			return true;
 		}
 	}
 	if ((this.runtime.waitarena + (this.option.every * 3600000)) <= Date.now()) {
-		debug('Elite: Add Arena Guard member '+this.runtime.nextarena);
+		debug(this.name,'Add Arena Guard member '+this.runtime.nextarena);
 		if (!Page.to('battle_arena', '?user=' + this.runtime.nextarena + '&lka=' + this.runtime.nextarena + '&agtw=1&ref=nf')) {
 			return true;
 		}
@@ -2890,7 +2893,7 @@ Generals.parse = function(change) {
 	if (Page.page === 'heroes_generals') {
 		var $elements = $('.generalSmallContainer2'), data = this.data;
 		if ($elements.length < length(data)) {
-			debug('Generals: Different number of generals, have '+$elements.length+', want '+length(data));
+			debug(this.name,'Different number of generals, have '+$elements.length+', want '+length(data));
 	//		Page.to('heroes_generals', ''); // Force reload
 			return false;
 		}
@@ -2943,6 +2946,7 @@ Generals.update = function(type) {
 	// End Priority Stuff
 	
 	if ((type === 'data' || type === Town) && invade && duel) {
+		//debug(this.name,'Calculating stats');
 		for (i in data) {
 			attack_bonus = Math.floor(sum(data[i].skills.regex(/([-+]?[0-9]*\.?[0-9]*) Player Attack|Increase Player Attack by ([0-9]+)/i)) + ((data[i].skills.regex(/Increase ([-+]?[0-9]*\.?[0-9]*) Player Attack for every Hero Owned/i) || 0) * (length(data)-1)));
 			defense_bonus = Math.floor(sum(data[i].skills.regex(/([-+]?[0-9]*\.?[0-9]*) Player Defense|Increase Player Defense by ([0-9]+)/i))	+ ((data[i].skills.regex(/Increase ([-+]?[0-9]*\.?[0-9]*) Player Defense for every Hero Owned/i) || 0) * (length(data)-1)));
@@ -2953,7 +2957,7 @@ Generals.update = function(type) {
 			army = (data[i].skills.regex(/Increases? Army Limit to ([0-9]+)/i) || 501);
 			gen_att = getAttDef(data, listpush, 'att', Math.floor(army / 5));
 			gen_def = getAttDef(data, listpush, 'def', Math.floor(army / 5));
-			att_when_att = (data[i].skills.regex(/([-+]?[0-9]+) Attack when attacked/i) || 0);
+			att_when_att = (data[i].skills.regex(/Increase Player Attack when Defending by ([-+]?[0-9]+)/i) || 0);
 			def_when_att = (data[i].skills.regex(/([-+]?[0-9]+) Defense when attacked/i) || 0);
 			att_when_att_potential = (att_when_att * 4) / data[i].level;	// Approximation
 			def_when_att_potential = (def_when_att * 4) / data[i].level;	// Approximation
@@ -3002,13 +3006,13 @@ Generals.to = function(name) {
 		return true;
 	}
 	if (!name || !this.data[name]) {
-		log('General "'+name+'" requested but not found!');
+		log(this.name,'General "'+name+'" requested but not found!');
 		return true; // Not found, so fake it
 	}
 	if (!Page.to('heroes_generals')) {
 		return false;
 	}
-	debug('Changing to General '+name);
+	debug(this.name,'Changing to General '+name);
 	Page.click('input[src$="' + this.data[name].img + '"]');
 	this.data[name].used = (this.data[name].used || 0) + 1;
 	return false;
@@ -3112,7 +3116,7 @@ Generals.best = function(type) {
 		}
 	}
 //	if (best) {
-//		debug('Best general found: '+best);
+//		debug(this.name,'Best general found: '+best);
 //	}
 	return (best || 'any');
 };
@@ -3196,7 +3200,7 @@ Generals.dashboard = function(sort, rev) {
 			}
 		}
 		if (gdown && gup) {
-			debug('Generals: Priority: Swapping '+gup+' with '+gdown);
+			debug(this.name,'Priority: Swapping '+gup+' with '+gdown);
 			Generals.data[gdown].priority++;
 			Generals.data[gup].priority--;
 		}
@@ -3215,7 +3219,7 @@ Generals.dashboard = function(sort, rev) {
 			}
 		}
 		if (gdown && gup) {
-			debug('Generals: Priority: Swapping '+gup+' with '+gdown);
+			debug(this.name,'Priority: Swapping '+gup+' with '+gdown);
 			Generals.data[gdown].priority++;
 			Generals.data[gup].priority--;
 		}
@@ -3308,27 +3312,27 @@ Gift.parse = function(change) {
 	//alert('Gift.parse running');
 	if (Page.page === 'index') {
 		// We need to get the image of the gift from the index page.
-//		debug('Gift: Checking for a waiting gift and getting the id of the gift.');
+//		debug(this.name,'Checking for a waiting gift and getting the id of the gift.');
 		if ($('span.result_body').text().indexOf('has sent you a gift') >= 0) {
 			this.runtime.gift.sender_ca_name = $('span.result_body').text().regex(/[\t\n]*(.+) has sent you a gift/i);
 			this.runtime.gift.name = $('span.result_body').text().regex(/has sent you a gift:\s+(.+)!/i);
 			this.runtime.gift.id = $('span.result_body img').attr('src').filepart();
-			debug('Gift: ' + this.runtime.gift.sender_ca_name + ' has a ' + this.runtime.gift.name + ' waiting for you. (' + this.runtime.gift.id + ')');
+			debug(this.name,this.runtime.gift.sender_ca_name + ' has a ' + this.runtime.gift.name + ' waiting for you. (' + this.runtime.gift.id + ')');
 			this.runtime.gift_waiting = true;
 			return true
 		} else if ($('span.result_body').text().indexOf('warrior wants to join your Army') >= 0) {
 			this.runtime.gift.sender_ca_name = 'A Warrior';
 			this.runtime.gift.name = 'Random Soldier';
 			this.runtime.gift.id = 'random_soldier';
-			debug('Gift: ' + this.runtime.gift.sender_ca_name + ' has a ' + this.runtime.gift.name + ' waiting for you.');
+			debug(this.name,this.runtime.gift.sender_ca_name + ' has a ' + this.runtime.gift.name + ' waiting for you.');
 			this.runtime.gift_waiting = true;
 			return true
 		}
 	} else if (Page.page === 'army_invite') {
 		// Check for sent
-//		debug('Gift: Checking for sent gifts.');
+//		debug(this.name,'Checking for sent gifts.');
 		if (this.runtime.sent_id && $('div.result').text().indexOf('request sent') >= 0) {
-			debug('Gift: ' + gifts[this.runtime.sent_id].name+' sent.');
+			debug(this.name,gifts[this.runtime.sent_id].name+' sent.');
 			for (j=0; j < Math.min(todo[this.runtime.sent_id].length, 30); j++) {	// Remove the IDs from the list because we have sent them
 				todo[this.runtime.sent_id].shift();
 			}
@@ -3342,40 +3346,40 @@ Gift.parse = function(change) {
 		}
 		
 		// Accepted gift first
-//		debug('Gift: Checking for accepted gift.');
+//		debug(this.name,'Checking for accepted gift.');
 		if (this.runtime.gift.sender_id) { // if we have already determined the ID of the sender
 			if ($('div.result').text().indexOf('accepted the gift') >= 0 || $('div.result').text().indexOf('have been awarded the gift') >= 0) { // and we have just accepted a gift
-				debug('Gift: Accepted ' + this.runtime.gift.name + ' from ' + this.runtime.gift.sender_ca_name + '(id:' + this.runtime.gift.sender_id + ')');
+				debug(this.name,'Accepted ' + this.runtime.gift.name + ' from ' + this.runtime.gift.sender_ca_name + '(id:' + this.runtime.gift.sender_id + ')');
 				received.push(this.runtime.gift); // add the gift to our list of received gifts.  We will use this to clear facebook notifications and possibly return gifts
 				this.runtime.work = true;	// We need to clear our facebook notifications and/or return gifts
 				this.runtime.gift = {}; // reset our runtime gift tracker
 			}
 		}
 		// Check for gifts
-//		debug('Gift: Checking for waiting gifts and getting the id of the sender if we already have the sender\'s name.');		
+//		debug(this.name,'Checking for waiting gifts and getting the id of the sender if we already have the sender\'s name.');
 		if ($('div.messages').text().indexOf('gift') >= 0) { // This will trigger if there are gifts waiting
 			this.runtime.gift_waiting = true;
 			if (!this.runtime.gift.id) { // We haven't gotten the info from the index page yet.
 				return false;	// let the work function send us to the index page to get the info.
 			}
-//			debug('Sender Name: ' + $('div.messages img[title*="' + this.runtime.gift.sender_ca_name + '"]').first().attr('title'));
+//			debug(this.name,'Sender Name: ' + $('div.messages img[title*="' + this.runtime.gift.sender_ca_name + '"]').first().attr('title'));
 			this.runtime.gift.sender_id = $('div.messages img[uid]').first().attr('uid'); // get the ID of the gift sender. (The sender listed on the index page should always be the first sender listed on the army page.)
 			if (this.runtime.gift.sender_id) {
 				this.runtime.gift.sender_fb_name = $('div.messages img[uid]').first().attr('title');
-//				debug('Gift: Found ' + this.runtime.gift.sender_fb_name + "'s ID. (" + this.runtime.gift.sender_id + ')');
+//				debug(this.name,'Found ' + this.runtime.gift.sender_fb_name + "'s ID. (" + this.runtime.gift.sender_id + ')');
 			} else {
-				debug("Gift: Can't find the gift sender's ID.");
+				log(this.name,"Can't find the gift sender's ID.");
 			}
 		} else {
 			this.runtime.gift_waiting = false;
 		}
 		
 	} else if (Page.page === 'army_gifts') { // Parse for the current available gifts
-//		debug('Gift: Parsing gifts.');
-//		debug('Gifts found: '+$('#app'+APPID+'_giftContainer div[id^="app'+APPID+'_gift"]').length);
+//		debug(this.name,'Parsing gifts.');
+//		debug(this.name,'Found: '+$('#app'+APPID+'_giftContainer div[id^="app'+APPID+'_gift"]').length);
 		$('div[id*="_giftContainer"] div[id*="_gift"]').each(function(i,el){
 			var id = $('img', el).attr('src').filepart(), name = $(el).text().trim().replace('!',''), slot = $(el).attr('id').regex(/_gift([0-9]+)/);
-//			debug('Gift adding: '+name+'('+id+') to slot '+slot);
+//			debug(this.name,'Adding: '+name+'('+id+') to slot '+slot);
 			if (!gifts[id]) {
 				gifts[id] = {};
 			}
@@ -3414,7 +3418,7 @@ Gift.work = function(state) {
 		if (!Page.to('army_invite')) {
 			return true;
 		}
-//		debug('Gift: Accepting ' + this.runtime.gift.name + ' from ' + this.runtime.gift.sender_ca_name + '(id:' + this.runtime.gift.sender_id + ')');
+//		debug(this.name,'Accepting ' + this.runtime.gift.name + ' from ' + this.runtime.gift.sender_ca_name + '(id:' + this.runtime.gift.sender_id + ')');
 		if (!Page.to('army_invite', '?act=acpt&rqtp=gift&uid=' + this.runtime.gift.sender_id) || this.runtime.gift.sender_id.length > 0) {	// Shortcut to accept gifts without going through Facebook's confirmation page
 			return true;
 		}
@@ -3435,7 +3439,7 @@ Gift.work = function(state) {
 		for (i in received){
 			var temptype = this.option.type;
 			if (typeof this.data.gifts[received[i].id] === 'undefined' && this.option.type != 'None') {
-				debug('Gift: ' + received[i].id+' was not found in our sendable gift list.');
+				debug(this.name,received[i].id+' was not found in our sendable gift list.');
 				temptype = 'Random';
 			}
 			switch(temptype) {
@@ -3446,7 +3450,7 @@ Gift.work = function(state) {
 							gift_ids.push(j);
 						}
 						random_gift_id = Math.floor(Math.random() * gift_ids.length);
-						debug('Gift: will randomly send a ' + this.data.gifts[gift_ids[random_gift_id]].name + ' to ' + received[i].sender_ca_name);
+						debug(this.name,'Will randomly send a ' + this.data.gifts[gift_ids[random_gift_id]].name + ' to ' + received[i].sender_ca_name);
 						if (!todo[gift_ids[random_gift_id]]) {
 							todo[gift_ids[random_gift_id]] = [];
 						}
@@ -3455,7 +3459,7 @@ Gift.work = function(state) {
 					this.runtime.work = true;
 					break;
 				case 'Same as Received':
-					debug('Gift: will return a ' + received[i].name + ' to ' + received[i].sender_ca_name);
+					debug(this.name,'Will return a ' + received[i].name + ' to ' + received[i].sender_ca_name);
 					if (!todo[received[i].id]) {
 						todo[received[i].id] = [];
 					}
@@ -3480,12 +3484,12 @@ Gift.work = function(state) {
 	}
 	
 	if (this.runtime.gift_sent > Date.now()) {	// We have sent gift(s) and are waiting for the fb popup
-//		debug('Gift: Waiting for FB popup.');
+//		debug(this.name,'Waiting for FB popup.');
 		if ($('div.dialog_buttons input[name="sendit"]').length){
 			this.runtime.gift_sent = null;
 			Page.click('div.dialog_buttons input[name="sendit"]');
 		} else if ($('span:contains("Out of requests")')) {
-			debug('Gift: We have run out of gifts to send.  Waiting one hour to retry.');
+			debug(this.name,'We have run out of gifts to send.  Waiting one hour to retry.');
 			this.runtime.gift_delay = Date.now() + 3600000;	// Wait an hour and try to send again.
 			Page.click('div.dialog_buttons input[value="Okay"]');
 		}
@@ -3501,14 +3505,14 @@ Gift.work = function(state) {
 				return true;
 			}
 			if ($('div[style*="giftpage_select"] div a[href*="giftSelection='+this.data.gifts[i].slot+'"]').length){
-				if ($('img[src*="giftpage_ca_friends_on"]').length){
+				if ($('img[src*="gift_invite_castle_on"]').length){
 					if ($('div.unselected_list').children().length) {
-						debug('Gift: Sending out ' + this.data.gifts[i].name);
+						debug(this.name,'Sending out ' + this.data.gifts[i].name);
 						k = 0;
 						for (j in todo[i]) {
 							if (k< 30) {	// Need to limit to 30 at a time
 								if (!$('div.unselected_list input[value=\'' + todo[i][j] + '\']').length){
-//									debug('Gift: User '+todo[i][j]+' wasn\'t in the CA friend list.');
+//									debug(this.name,'User '+todo[i][j]+' wasn\'t in the CA friend list.');
 									continue;
 								}
 								Page.click('div.unselected_list input[value="' + todo[i][j] + '"]');
@@ -3526,8 +3530,8 @@ Gift.work = function(state) {
 					} else {
 						return true;
 					}
-				} else if ($('div.tabBtn img.imgButton[src*="giftpage_ca_friends_off"]').length) {
-					Page.click('div.tabBtn img.imgButton[src*="giftpage_ca_friends_off"]');
+				} else if ($('div.tabBtn img.imgButton[src*="gift_invite_castle_off"]').length) {
+					Page.click('div.tabBtn img.imgButton[src*="gift_invite_castle_off"]');
 					return true;
 				} else {
 					return true;
@@ -3588,11 +3592,11 @@ Heal.me = function() {
 	if (!Page.to('keep_stats')) {
 		return true;
 	}
-	debug('Heal: Healing...');
+	debug(this.name,'Healing...');
 	if ($('input[value="Heal Wounds"]').length) {
 		Page.click('input[value="Heal Wounds"]');
 	} else {
-		log('Danger Danger Will Robinson... Unable to heal!');
+		log(this.name,'Danger Danger Will Robinson... Unable to heal!');
 	}
 	return false;
 };
@@ -3651,18 +3655,18 @@ History.update = function(type) {
 			delete this.data[i];
 		}
 	}
-//	debug('Exp: '+this.get('exp'));
-//	debug('Exp max: '+this.get('exp.max'));
-//	debug('Exp max change: '+this.get('exp.max.change'));
-//	debug('Exp min: '+this.get('exp.min'));
-//	debug('Exp min change: '+this.get('exp.min.change'));
-//	debug('Exp change: '+this.get('exp.change'));
-//	debug('Exp mean: '+this.get('exp.mean.change'));
-//	debug('Exp harmonic: '+this.get('exp.harmonic.change'));
-//	debug('Exp geometric: '+this.get('exp.geometric.change'));
-//	debug('Exp mode: '+this.get('exp.mode.change'));
-//	debug('Exp median: '+this.get('exp.median.change'));
-//	debug('Average Exp = weighted average: ' + this.get('exp.average.change') + ', mean: ' + this.get('exp.mean.change') + ', geometric: ' + this.get('exp.geometric.change') + ', harmonic: ' + this.get('exp.harmonic.change') + ', mode: ' + this.get('exp.mode.change') + ', median: ' + this.get('exp.median.change'));
+//	debug(this.name,'Exp: '+this.get('exp'));
+//	debug(this.name,'Exp max: '+this.get('exp.max'));
+//	debug(this.name,'Exp max change: '+this.get('exp.max.change'));
+//	debug(this.name,'Exp min: '+this.get('exp.min'));
+//	debug(this.name,'Exp min change: '+this.get('exp.min.change'));
+//	debug(this.name,'Exp change: '+this.get('exp.change'));
+//	debug(this.name,'Exp mean: '+this.get('exp.mean.change'));
+//	debug(this.name,'Exp harmonic: '+this.get('exp.harmonic.change'));
+//	debug(this.name,'Exp geometric: '+this.get('exp.geometric.change'));
+//	debug(this.name,'Exp mode: '+this.get('exp.mode.change'));
+//	debug(this.name,'Exp median: '+this.get('exp.median.change'));
+//	debug(this.name,'Average Exp = weighted average: ' + this.get('exp.average.change') + ', mean: ' + this.get('exp.mean.change') + ', geometric: ' + this.get('exp.geometric.change') + ', harmonic: ' + this.get('exp.harmonic.change') + ', mode: ' + this.get('exp.mode.change') + ', median: ' + this.get('exp.median.change'));
 };
 
 History.set = function(what, value) {
@@ -3820,7 +3824,7 @@ History.get = function(what) {
 				if (value !== null && last !== null) {
 					list.push(value - last);
 					if (isNaN(list[list.length - 1])) {
-						debug('NaN: '+value+' - '+last);
+						debug(this.name,'NaN: '+value+' - '+last);
 					}
 				}
 				last = value;
@@ -3939,7 +3943,7 @@ Idle.option = {
 	town: 'Never',
 	battle: 'Quarterly',
 	monsters: 'Hourly',
-        collect: 'Never'	
+        collect: 'Never'
 };
 
 Idle.when = ['Never', 'Quarterly', 'Hourly', '2 Hours', '6 Hours', '12 Hours', 'Daily', 'Weekly'];
@@ -3980,7 +3984,7 @@ Idle.display = [
                 id:'collect',
                 label:'Apprentice Reward',
                 select:Idle.when
-        }
+	}
 ];
 
 Idle.work = function(state) {
@@ -4055,7 +4059,7 @@ Income.work = function(state) {
 	if (!Income.option.margin) {
 		return false;
 	}
-//	debug('Income: '+when+', Margin: '+Income.option.margin);
+//	debug(this.name,when + ', Margin: ' + Income.option.margin);
 	if (Player.get('cash_timer') > this.option.margin) {
 		if (state && this.option.bank) {
 			return Bank.work(true);
@@ -4068,7 +4072,7 @@ Income.work = function(state) {
 	if (this.option.general && !Generals.to(Generals.best('income'))) {
 		return true;
 	}
-	debug('Income: Waiting for Income... (' + Player.get('cash_timer') + ' seconds)');
+	debug(this.name,'Waiting for Income... (' + Player.get('cash_timer') + ' seconds)');
 	return true;
 };
 
@@ -4235,7 +4239,7 @@ Land.work = function(state) {
 			} else {
 				$('select', $('.land_buy_costs .gold', el).parent().parent().next()).val(Land.runtime.buy <= -10 ? 10 : (Land.runtime.buy <= -5 ? 5 : 1));
 			}
-			debug('Land: ' + (Land.runtime.buy > 0 ? 'Buy' : 'Sell') + 'ing ' + Math.abs(Land.runtime.buy) + ' x ' + Land.runtime.best + ' for $' + addCommas(Math.abs(Land.runtime.cost)));
+			debug(this.name,(Land.runtime.buy > 0 ? 'Buy' : 'Sell') + 'ing ' + Math.abs(Land.runtime.buy) + ' x ' + Land.runtime.best + ' for $' + addCommas(Math.abs(Land.runtime.cost)));
 			Page.click($('.land_buy_costs input[name="' + (Land.runtime.buy > 0 ? 'Buy' : 'Sell') + '"]', el));
 		}
 	});
@@ -4378,7 +4382,7 @@ LevelUp.update = function(type) {
 				quests[i][1] = quests[i][1].concat(quests[i - quest_data[quests[i][1][0]].energy][1])
 			}
 		}
-//		debug('Quickest '+quests.length+' Quests: '+JSON.stringify(quests));
+//		debug(this.name,'Quickest '+quests.length+' Quests: '+JSON.stringify(quests));
 	} else if (type === Player) {
 		if (exp !== runtime.exp) { // Experience has changed...
 			if (runtime.stamina > stamina) {
@@ -4443,14 +4447,14 @@ LevelUp.work = function(state) {
 			Queue.burn.energy = Math.max(0, energy - Queue.get('option.energy'));
 			Battle.set('option.monster', runtime.battle_monster);
 			runtime.running = false;
-//			debug('LevelUp: running '+runtime.running);
+//			debug(this.name,'running '+runtime.running);
 		} else if (runtime.running && runtime.level == Player.get('level')) { //We've gotten less exp per stamina than we hoped and can't reach the next level.
 			Generals.set('runtime.disabled', false);
 			Queue.burn.stamina = Math.max(0, stamina - Queue.get('option.stamina'));
 			Queue.burn.energy = Math.max(0, energy - Queue.get('option.energy'));
 			Battle.set('option.monster', runtime.battle_monster);
 			runtime.running = false;
-//			debug('LevelUp: running '+runtime.running);
+//			debug(this.name,'Running '+runtime.running);
 		}
 		return false;
 	}
@@ -4464,14 +4468,14 @@ LevelUp.work = function(state) {
 		runtime.level = Player.get('level');
 		runtime.battle_monster = Battle.get('option.monster');
 		runtime.running = true;
-//		debug('LevelUp: running '+runtime.running);
+//		debug(this.name,'Running '+runtime.running);
 		Battle.set('option.monster', false);
 	}
 	general = Generals.best(this.option.general); // Get our level up general
 	if (general && general !== 'any' && Player.get('exp_needed') < 25) { // If we want to change...
 		Generals.set('runtime.disabled', false);	// make sure changing Generals is not disabled
 		if (general === Player.get('general') || Generals.to(general)) { // ...then change if needed
-//			debug('LevelUp: Disabling Generals because we are within 25 XP from leveling.');
+//			debug(this.name,'Disabling Generals because we are within 25 XP from leveling.');
 			Generals.set('runtime.disabled', true);	// and lock the General se we can level up.
 		} else {
 			return true;	// Try to change generals again
@@ -4479,7 +4483,7 @@ LevelUp.work = function(state) {
 	}
 	// We don't have focus, but we do want to level up quicker
     if (this.option.order !== 'Stamina' || !stamina || (stamina < 5 && Battle.option.monster && !Battle.option.points)){
-        debug('LevelUp: Running Energy Burn');
+        debug(this.name,'Running Energy Burn');
 	if (Player.get('energy')) { // Only way to burn energy is to do quests - energy first as it won't cost us anything
 		runtime.old_quest = Quest.runtime.best;
 		runtime.old_quest_energy = Quest.runtime.energy;
@@ -4490,7 +4494,7 @@ LevelUp.work = function(state) {
 		return false;
 	}}
         else
-            {debug('LevelUp: Running Stamina Burn');}
+            {debug(this.name,'Running Stamina Burn');}
     
 	Quest._update('data'); // Force Quest to decide it's best quest again...
 	// Got to have stamina left to get here, so burn it all
@@ -4849,7 +4853,14 @@ Monster.types = {
 
 //Monster.dispel = ['input[src$="button_dispel.gif"]'];
 Monster.fortify = ['input[src$="attack_monster_button3.jpg"]', 'input[src$="button_dispel.gif"]', 'input[src$="seamonster_fortify.gif"]', 'input[src$="nm_secondary_heal.gif"]', 'input[src$="nm_secondary_strengthen.gif"]', 'input[src$="nm_secondary_cripple.jpg"]', 'input[src$="nm_secondary_deflect.jpg"]'];
-Monster.attack = ['input[src$="attack_monster_button2.jpg"]', 'input[src$="seamonster_power.gif"]', 'input[src$="attack_monster_button.jpg"]', 'input[src$="event_attack2.gif"]', 'input[src$="event_attack1.gif"]', 'input[src$="nm_primary_smite.gif"]', 'input[src$="nm_primary_bash.gif"]', 'input[src$="nm_primary_bolt.gif"]', 'input[src$="nm_primary_stab.gif"]'];
+Monster.attack = ['input[src$="attack_monster_button2.jpg"]', 'input[src$="seamonster_power.gif"]', 'input[src$="attack_monster_button.jpg"]', 'input[src$="event_attack2.gif"]', 'input[src$="event_attack1.gif"]', 'input[src$="nm_primary_smite.gif"]', 'input[src$="nm_primary_bash.gif"]', 'input[src$="nm_primary_bolt.gif"]', 'input[src$="nm_primary_stab.gif"]'
+    ,'input[src$="power_button_5.gif"]','input[src$="button_bash_5.gif"]','input[src$="nm_primary_smite_5.gif"]', 'input[src$="nm_primary_bolt_5.gif"]', 'input[src$="nm_primary_stab_5.gif"]'
+    ,'input[src$="power_button_10.gif"]','input[src$="button_bash_10.gif"]','input[src$="nm_primary_smite_10.gif"]', 'input[src$="nm_primary_bolt_10.gif"]', 'input[src$="nm_primary_stab_10.gif"]'
+    ,'input[src$="power_button_20.gif"]','input[src$="button_bash_20.gif"]','input[src$="nm_primary_smite_20.gif"]', 'input[src$="nm_primary_bolt_20.gif"]', 'input[src$="nm_primary_stab_20.gif"]'
+    ,'input[src$="power_button_30.gif"]','input[src$="button_bash_30.gif"]','input[src$="nm_primary_smite_30.gif"]', 'input[src$="nm_primary_bolt_30.gif"]', 'input[src$="nm_primary_stab_30.gif"]'
+    ,'input[src$="power_button_50.gif"]','input[src$="button_bash_50.gif"]','input[src$="nm_primary_smite_50.gif"]', 'input[src$="nm_primary_bolt_50.gif"]', 'input[src$="nm_primary_stab_50.gif"]'
+    ,'input[src$="button_nm_p_power_attack.gif"]'];
+Monster.attack_fallback = ['input[src*="seamonster_power"]', 'input[src*="nm_primary_smite"]', 'input[src*="nm_primary_bash"]', 'input[src*="nm_primary_bolt"]', 'input[src*="nm_primary_stab"]','input[src*="power_button"]','input[src*="button_bash"]','input[src*="attack_monster_button"]', 'input[src*="event_attack"]'];
 Monster.secondary = ['input[src$="nm_secondary_cripple.jpg"]', 'input[src$="nm_secondary_deflect.jpg"]'];
 Monster.health_img = ['img[src$="nm_red.jpg"]', 'img[src$="monster_health_background.jpg"]'];
 Monster.shield_img = ['img[src$="bar_dispel.gif"]'];
@@ -4890,22 +4901,22 @@ Monster.parse = function(change) {
 		uid = $('img[linked][size="square"]').attr('uid');
 		for (i in types) {
 			if (types[i].dead && $('img[src$="'+types[i].dead+'"]').length) {
-//				debug('Found a dead '+i);
+//				debug(this.name,'Found a dead '+i);
 				type = i;
 				timer = types[i].timer;
 				dead = true;
 			} else if (types[i].image && ($('img[src$="'+types[i].image+'"]').length || $('div[style*="'+types[i].image+'"]').length)) {
-//				debug('Parsing '+i);
+//				debug(this.name,'Parsing '+i);
 				type = i;
 				timer = types[i].timer;
 			} else if (types[i].image2 && ($('img[src$="'+types[i].image2+'"]').length || $('div[style*="'+types[i].image2+'"]').length)) {
-//				debug('Parsing second stage '+i);
+//				debug(this.name,'Parsing second stage '+i);
 				type = i;
 				timer = types[i].timer2 || types[i].timer;
 			}
 		}
 		if (!uid || !type) {
-			debug('Monster: Unknown monster (probably dead)');
+			debug(this.name,'Unknown monster (probably dead)');
 			return false;
 		}
 		data[uid] = data[uid] || {};
@@ -4982,23 +4993,41 @@ Monster.parse = function(change) {
 				}
 			}
 			
-/*			debug('Parsed Monster Health: '+monster.health.round(1)+'%');
-			if (isNumber(monster.dispel)) { debug('Parsed Monster Dispel: '+ monster.dispel.round(1)+'%');}
-			if (isNumber(monster.defense)) { debug('Parsed Monster Defense: '+monster.defense.round(1)+'%(Total: '+monster.totaldefense.round(1)+'%)');}
-			if (isNumber(monster.strength)) { debug('Parsed Monster Strength: '+ monster.strength.round(1)+'%');}
+/*			debug(this.name,'Parsed Monster Health: '+monster.health.round(1)+'%');
+			if (isNumber(monster.dispel)) { debug(this.name,'Parsed Monster Dispel: '+ monster.dispel.round(1)+'%');}
+			if (isNumber(monster.defense)) { debug(this.name,'Parsed Monster Defense: '+monster.defense.round(1)+'%(Total: '+monster.totaldefense.round(1)+'%)');}
+			if (isNumber(monster.strength)) { debug(this.name,'Parsed Monster Strength: '+ monster.strength.round(1)+'%');}
 */			monster.timer = $('#app'+APPID+'_monsterTicker').text().parseTimer();
 			monster.finish = Date.now() + (monster.timer * 1000);
 			monster.damage_total = 0;
+                        monster.damage_siege = 0;
+                        monster.damage_players = 0;
 			monster.damage = {};
-			$('td.dragonContainer table table a[href^="http://apps.facebook.com/castle_age/keep.php?user="]').each(function(i,el){
-				var user = $(el).attr('href').regex(/user=([0-9]+)/i), tmp = $(el).parent().parent().next().text().replace(/[^0-9\/]/g,''), dmg = tmp.regex(/([0-9]+)/), fort = tmp.regex(/\/([0-9]+)/);
-				if (monster.raid){
-                                    tmp = $(el).parent().next().text().replace(/[^0-9\/]/g,''), dmg = tmp.regex(/([0-9]+)/), fort = tmp.regex(/\/([0-9]+)/);
-                                }
-                                monster.damage[user]  = (fort ? [dmg, fort] : [dmg]);
-				monster.damage_total += dmg;
+			$('img[src*="siege_small"]').each(function(i,el){
+				var siege = $(el).parent().next().next().next().children().eq(0).text();
+                                var tmp = $(el).parent().next().next().next().children().eq(1).text().replace(/[^0-9]/g,'');
+                                var dmg = tmp.regex(/([0-9]+)/);
+                                //debug('Monster Siege',siege + ' did ' + addCommas(dmg) + ' amount of damage.');
+				monster.damage[siege]  = [dmg];
+				monster.damage_siege += dmg;
+                                monster.damage_total += dmg;
+			});                        
+                        $('td.dragonContainer table table a[href^="http://apps.facebook.com/castle_age/keep.php?user="]').each(function(i,el){
+				var user = $(el).attr('href').regex(/user=([0-9]+)/i);
+				if (types[type].raid){
+				    var tmp = $(el).parent().next().text().replace(/[^0-9\/]/g,'');
+                                } else {
+				    var tmp = $(el).parent().parent().next().text().replace(/[^0-9\/]/g,'');
+				}
+				var dmg = tmp.regex(/([0-9]+)/), fort = tmp.regex(/\/([0-9]+)/);
+				monster.damage[user]  = (fort ? [dmg, fort] : [dmg]);
+				monster.damage_players += dmg + fort;
+                                monster.damage_total += dmg + fort;
 			});
-			monster.dps = monster.damage_total / (timer - monster.timer);
+                        //debug(this.name,'[UID=' + uid + ']' + this.data[uid][type].name + '\'s ' + this.types[type].name + ' Siege Damage = ' + addCommas(this.data[uid][type].damage_siege));
+                        //debug(this.name,'[UID=' + uid + ']' + this.data[uid][type].name + '\'s ' + this.types[type].name + ' Player Damage = ' + addCommas(this.data[uid][type].damage_players));
+                        //debug(this.name,'[UID=' + uid + ']' + this.data[uid][type].name + '\'s ' + this.types[type].name + ' Total Damage = ' + addCommas(this.data[uid][type].damage_total));
+			monster.dps = monster.damage_players / (timer - monster.timer);
 			if (types[type].raid) {
 				monster.total = monster.damage_total + $('div[style*="monster_health_back.jpg"] div:nth-child(2)').text().regex(/([0-9]+)/);
 			} else {
@@ -5062,14 +5091,14 @@ Monster.update = function(what) {
 	for (i in this.data) { // Flush unknown monsters
 		for (j in this.data[i]) {
 			if (!this.data[i][j].state || this.data[i][j].state === null) {
-                                debug('Monster: Found Invalid Monster State=(' + this.data[i][j].state + ')');
+                                log(this.name,'Found Invalid Monster State=(' + this.data[i][j].state + ')');
 				delete this.data[i][j];
 			} else if (this.data[i][j].state === 'engage') {
 				this.runtime.count++;
 			}
 		}
 		if (!length(this.data[i])) { // Delete uid's without an active monster
-                        debug('Monster: Found Invalid Monster ID=(' + this.data[i] + ')');
+                        log(this.name,'Found Invalid Monster ID=(' + this.data[i] + ')');
 			delete this.data[i];
 		}
 	}
@@ -5089,8 +5118,11 @@ Monster.update = function(what) {
 				break;
 			}
 			if ((typeof this.data[i][j].ignore === 'undefined' || !this.data[i][j].ignore) && this.data[i][j].state === 'engage' && this.data[i][j].finish > Date.now() && (this.option.ignore_stats || (Player.get('health') >= (this.types[j].raid ? 13 : 10) && Queue.burn.stamina >= ((this.types[j].raid && this.option.raid.search('x5') == -1) ? 1 : 5)))) {
+                if (!this.data[i][j].battle_count){
+                    this.data[i][j].battle_count = 0;
+                }
                 if (this.data[i][j].name === 'You' && this.option.own){
-                    //debug('Monster: Attacking own Monster ' + this.option.own)
+                    //debug(this.name,'Attacking own Monster ' + this.option.own)
                     list.push([i, j, this.data[i][j].health, this.data[i][j].eta, this.data[i][j].battle_count]);
                     break;
                 }
@@ -5193,7 +5225,7 @@ Monster.work = function(state) {
 		if (!Generals.to(Generals.best((this.option.raid.search('Invade') == -1) ? 'raid-duel' : 'raid-invade'))) {
 			return true;
 		}
-//		debug('Raid: '+this.option.raid+' '+uid);
+//		debug(this.name,'Raid: '+this.option.raid+' '+uid);
 		switch(this.option.raid) {
 			case 'Invade':
 				btn = $('input[src$="raid_attack_button.gif"]:first');
@@ -5209,33 +5241,67 @@ Monster.work = function(state) {
 				break;
 		}
 	} else {
-		j = (this.runtime.fortify && Queue.burn.energy >= 10) ? 'fortify' : 'attack';
+                
+                if (!this.runtime.monster_btn){
+                    this.runtime.monster_btn['monster'] = type;
+                    this.runtime.monster_btn[type]['id'] = 0;
+                    debug(this.name,'Setting monster type to ' + type);
+                }
+                for (i=0; i<this.runtime['monster_btn'].length; i++) {
+                    debug(this.name,'Monster Button Length =' + this.runtime['monster_btn'].length);
+                    if (this.runtime['monster_btn'] === type){
+                      debug(this.name,'Found monster type of ' + this.runtime['monster_btn']);
+                }
+                }
+                /*
+                 *if(this.data[uid][type].button_fail <= 5 || !this.data[uid][type].button_fail){
+                    //Primary method of finding button.
+                    //debug(this.name,"Setting Primary button location.");
+                    j = (this.runtime.fortify && Queue.burn.energy >= 10) ? 'fortify' : 'attack';
+                } else{
+                    //Enable fallback method of finding attack button.
+                    //debug(this.name,"Setting Fallback button location.");
+                    j = (this.runtime.fortify && Queue.burn.energy >= 10) ? 'fortify' : 'attack_fallback';
+                }
 		if (!Generals.to(Generals.best(j))) {
 			return true;
 		}
-		debug('Monster: Try to ' + j + ' ' + uid + '\'s ' + this.types[type].name);
+		debug(this.name,'Try to ' + j + ' [UID=' + uid + ']' + this.data[uid][type].name + '\'s ' + this.types[type].name);
 		for (i=0; i<this[j].length; i++) {
-//			debug('trying btn = '+this[j][i]);
+			//debug(this.name,'Trying btn = '+this[j][i]);
 			btn = $(this[j][i]);
 			if (btn.length) {
-//				debug('found btn = '+this[j][i]);
+				//debug(this.name,'Found btn = '+this[j][i]);
+                                this.data[uid][type].button_fail = 0;
 				break;
 			}
-		}
+                }
+                if (!btn || !btn.length){
+                    this.data[uid][type].button_fail = this.data[uid][type].button_fail + 1;
+                    debug(this.name,'[UID=' + uid + ']' + this.data[uid][type].name + '\'s ' + this.types[type].name + ' Button Fail = ' + this.data[uid][type].button_fail);
+                }
+                if (this.data[uid][type].button_fail > 10){                    
+                    log(this.name,'Ignoring Monster ' + this.data[uid][type].name + '\'s ' + this.types[type].name + this.data[uid][type] + ': Unable to locate ' + j + ' button ' + this.data[uid][type].button_fail + ' times!');
+                    this.data[uid][type].ignore = true;
+                    this.data[uid][type].button_fail = 0;}
+               */
 	}
-	if (!btn || !btn.length || (Page.page !== 'keep_monster_active' && Page.page !== 'keep_monster_active2') || $('div[style*="dragon_title_owner"] img[linked]').attr('uid') != uid) {
+	if (!btn || !btn.length || (Page.page !== 'keep_monster_active' && Page.page !== 'keep_monster_active2') || ($('div[style*="dragon_title_owner"] img[linked]').attr('uid') != uid && $('div[style*="nm_top"] img[linked]').attr('uid') != uid)) {
+/*		debug(this.name,'Reloading page. Button = ' + btn.attr('name'));
+                debug(this.name,'Reloading page. Page.page = '+ Page.page);
+                debug(this.name,'Reloading page. Monster Owner UID is ' + $('div[style*="dragon_title_owner"] img[linked]').attr('uid') + ' Expecting UID : ' + uid);
+*/
 		Page.to(this.types[type].raid ? 'battle_raid' : 'keep_monster', '?user=' + uid + (this.types[type].mpool ? '&mpool='+this.types[type].mpool : ''));
 		return true; // Reload if we can't find the button or we're on the wrong page
 	}
-        /* Trying to find element of image following CTA button
-         *
-         */
-        //debug('Monster: Current Siege Phase is: '+ $('img[title*="construct"]').attr('title')/*.title().regex(/ (.*)/i)*/);
-	
+        /*
+        tmp =  $('input[alt="ask for help"]').next('.image');
+        debug(this.name,'New Siege locator: ' + tmp.attr('title').regex(/(.*)/i));
+	*/
         if (this.option.assist && typeof $('input[name*="help with"]') !== 'undefined' && (typeof this.data[uid][type].phase === 'undefined' || $('input[name*="help with"]').attr('title').regex(/ (.*)/i) !== this.data[uid][type].phase)){
-		debug('Monster: Current Siege Phase is: '+ $('input[name*="help with"]').attr('title').regex(/ (.*)/i));
-                this.data[uid][type].phase = $('input[name*="help with"]').attr('title').regex(/ (.*)/i);
-		debug('Monster: Found a new siege phase ('+this.data[uid][type].phase+'), assisting now.');
+		debug(this.name,'Current Siege Phase is: '+ this.data[uid][type].phase);
+		this.data[uid][type].phase = $('input[name*="help with"]').attr('title').regex(/ (.*)/i);
+		debug(this.name,'Found a new siege phase ('+this.data[uid][type].phase+'), assisting now.');
 		Page.to(this.types[type].raid ? 'battle_raid' : 'keep_monster', '?user=' + uid + '&action=doObjective' + (this.types[type].mpool ? '&mpool=' + this.types[type].mpool : '') + '&lka=' + i + '&ref=nf');
 		return true;
 	}
@@ -5249,13 +5315,15 @@ Monster.work = function(state) {
 		}
 		target_info = $('div[id*="raid_atk_lst0"] div div').text().regex(/Lvl\s*([0-9]+).*Army: ([0-9]+)/);
 		if ((this.option.armyratio !== 'Any' && ((target_info[1]/Player.get('army')) > this.option.armyratio)) || (this.option.levelratio !== 'Any' && ((target_info[0]/Player.get('level')) > this.option.levelratio))){ // Check our target (first player in Raid list) against our criteria - always get this target even with +1
-			debug('Monster: No valid Raid target!');
+			log(this.name,'No valid Raid target!');
 			Page.to('battle_raid', ''); // Force a page reload to change the targets
 			return true;
 		}
 	}
 	this.runtime.uid = this.runtime.type = null; // Force us to choose a new target...
+        //debug(this.name,'Clicking Button ' + btn.attr('name'));
 	Page.click(btn);
+        this.data[uid][type].button_fail = 0;
 	return true;
 };
 
@@ -5339,7 +5407,7 @@ Monster.dashboard = function(sort, rev) {
 		}
 		td(output, '<a href="http://apps.facebook.com/castle_age/' + (Monster.types[j].raid ? 'raid.php' : 'battle_monster.php') + url + '"><img src="' + imagepath + Monster.types[j].list + '" style="width:72px;height:20px; position: relative; left: -8px; opacity:.7;" alt="' + j + '"><strong class="overlay">' + monster.state + '</strong></a>', 'title="' + Monster.types[j].name + '"');
 		var image_url = imagepath + Monster.types[j].list;
-//		debug(image_url);
+//		debug(this.name,image_url);
 		th(output, '<a class="golem-monster-ignore" name="'+i+'+'+j+'" title="Toggle Active/Inactive"'+(Monster.data[i][j].ignore ? ' style="text-decoration: line-through;"' : '')+'>'+Monster.data[i][j].name+'</a>');
 		td(output, blank ? '' : monster.health === 100 ? '100%' : addCommas(monster.total - monster.damage_total) + ' (' + monster.health.round(1) + '%)');
 		td(output, blank ? '' : isNumber(monster.totaldefense) ? ((monster.totaldefense-50).round(1))+'%' : '', (isNumber(monster.strength) ? 'title="Max: '+((monster.strength-50).round(1))+'%"' : ''));
@@ -5419,7 +5487,7 @@ News.parse = function(change) {
 					result = 'loss';
 				}
 				if (time > last_time) {
-//					debug('News: Add to History (+battle): exp = '+my_xp+', bp = '+my_bp+', income = '+my_cash);
+//					debug(this.name,'Add to History (+battle): exp = '+my_xp+', bp = '+my_bp+', income = '+my_cash);
 					time = Math.floor(time / 3600000);
 					History.add([time, 'exp+battle'], my_xp);
 					History.add([time, 'bp+battle'], my_bp);
@@ -5677,7 +5745,7 @@ Potions.work = function(state) {
 	}
 	for(var i in this.data) {
 		if (typeof this.option[i.toLowerCase()] === 'number' && this.data[i] > this.option[i.toLowerCase()]) {
-			debug('Potions: Wanting to drink a ' + i + ' potion');
+			debug(this.name,'Wanting to drink a ' + i + ' potion');
 			Page.click('.statUnit:contains("' + i + '") form .imgButton input');
 			break;
 		}
@@ -5760,7 +5828,7 @@ Quest.parse = function(change) {
 	}
 	for (i in quest) {
 		if (quest[i].area === area && (area !== 'quest' || quest[i].land === land)) {
-//			debug('Quest: Deleting ' + i + '(' + (Quest.land[quest[i].land] || quest[i].area) + ')');
+//			debug(this.name,'Deleting ' + i + '(' + (Quest.land[quest[i].land] || quest[i].area) + ')');
 			delete quest[i];
 		}
 	}
@@ -5853,7 +5921,7 @@ Quest.update = function(type) {
 		this.lastunique = Date.now();
 	}
 	if (!best && this.option.what !== 'Nothing') {
-//		debug('Quest: option = ' + this.option.what);
+//		debug(this.name,'option = ' + this.option.what);
 //		best = (this.runtime.best && this.data[this.runtime.best] && (this.data[this.runtime.best].influence < 100) ? this.runtime.best : null);
 		for (i in this.data) {
 			switch(this.option.what) {
@@ -5890,7 +5958,7 @@ Quest.update = function(type) {
 		this.runtime.best = best;
 		if (best) {
 			this.runtime.energy = this.data[best].energy;
-			debug('Quest: Wanting to perform - ' + best + ' in ' + (typeof this.data[best].land === 'number' ? this.land[this.data[best].land] : this.area[this.data[best].area]) + ' (energy: ' + this.data[best].energy + ', experience: ' + this.data[best].exp + ', reward: $' + addCommas(this.data[best].reward) + ')');
+			debug(this.name,'Wanting to perform - ' + best + ' in ' + (typeof this.data[best].land === 'number' ? this.land[this.data[best].land] : this.area[this.data[best].area]) + ' (energy: ' + this.data[best].energy + ', experience: ' + this.data[best].exp + ', reward: $' + addCommas(this.data[best].reward) + ')');
 		}
 	}
 	if (best) {
@@ -5979,12 +6047,12 @@ Quest.work = function(state) {
 			}
 			break;
 		default:
-			debug('Quest: Can\'t get to quest area!');
+			log(this.name,'Can\'t get to quest area!');
 			return false;
 	}
-	debug('Quest: Performing - ' + best + ' (energy: ' + this.data[best].energy + ')');
+	debug(this.name,'Performing - ' + best + ' (energy: ' + this.data[best].energy + ')');
 	if (!Page.click('div.action[title^="' + best + ':"] input[type="image"]')) { // Can't find the quest, so either a bad page load, or bad data - delete the quest and reload, which should force it to update ok...
-		debug('Quest: Can\'t find button for ' + best + ', so deleting and re-visiting page...');
+		debug(this.name,'Can\'t find button for ' + best + ', so deleting and re-visiting page...');
 		delete this.data[best];
 		Page.reload();
 	}
@@ -6137,7 +6205,7 @@ Title.update = function(type) {
 					output += typeof value === 'number' ? addCommas(value) : typeof value === 'string' ? value : '';
 					this._watch(worker); // Doesn't matter how often we add, it's only there once...
 				} else {
-					debug('Title: Bad worker specified = "' + tmp[1] + '"');
+					debug(this.name,'Bad worker specified = "' + tmp[1] + '"');
 				}
 			}
 		}
@@ -6361,7 +6429,7 @@ Town.buy = function(item, number) { // number is absolute including already owne
 	}
 	$('tr.eq_buy_row,tr.eq_buy_row2').each(function(i,el){
 		if ($('div.eq_buy_txt strong:first', el).text().trim() === item) {
-			debug('Town: Buying ' + qty + ' x ' + item + ' for $' + addCommas(qty * Town.data[item].cost));
+			debug(this.name,'Buying ' + qty + ' x ' + item + ' for $' + addCommas(qty * Town.data[item].cost));
 			$('div.eq_buy_costs select[name="amount"]:eq(0)', el).val(qty);
 			Page.click($('div.eq_buy_costs input[name="Buy"]', el));
 		}
