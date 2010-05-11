@@ -675,7 +675,7 @@ Monster.update = function(what) {
 	this.runtime.uid = uid;
 	this.runtime.type = type;
 	if (uid && type) {
-		if(this.option.first && (typeof this.data[uid][type].mclass === 'undefined' || this.data[uid][type].mclass < 2) && ((typeof this.data[uid][type].totaldefense !== 'undefined' && this.data[uid][type].totaldefense < this.option.fortify && this.data[uid][type].defense < 100))) {
+		if(this.option.first && this.types[type].energy_action /* (typeof this.data[uid][type].mclass === 'undefined' || this.data[uid][type].mclass < 2) */ && ((typeof this.data[uid][type].totaldefense !== 'undefined' && this.data[uid][type].totaldefense < this.option.fortify && this.data[uid][type].defense < 100))) {
 			this.runtime.fortify = true;
 		} else if (typeof this.data[uid][type].mclass !== 'undefined' && this.data[uid][type].mclass > 1 && typeof this.data[uid][type].secondary !== 'undefined' && this.data[uid][type].secondary < 100){
 			this.runtime.fortify = true;
@@ -697,7 +697,7 @@ Monster.update = function(what) {
 };
 
 Monster.work = function(state) {
-	var i, j, target_info = [], battle_list, list = [], uid = this.runtime.uid, type = this.runtime.type, btn = null;
+	var i, j, target_info = [], battle_list, list = [], uid = this.runtime.uid, type = this.runtime.type, btn = null, b, max;
 
 	if (!this.runtime.check && ((!this.runtime.fortify || Queue.burn.energy < 10 || Player.get('health') < 10) && (!this.runtime.attack || Queue.burn.stamina < this.runtime.stamina || Player.get('health') < this.runtime.health))) {
 		return false;
@@ -737,7 +737,28 @@ Monster.work = function(state) {
 				break;
 		}
 	} else {
-		if(this.data[uid][type].button_fail <= 5 || !this.data[uid][type].button_fail){
+                b = $('input[name="Attack Dragon"]').length;
+                debug(this.name,'Current number of buttons is ' + b);
+                j = (this.runtime.fortify && Queue.burn.energy >= 10) ? 'fortify' : 'attack';
+
+                if (this.types[type].energy_action && j === 'fortify'){
+                    max = b - 1;
+                    btn = $('input[name="Attack Dragon"]').eq(max);
+
+                    debug(this.name,"Setting fortify button.");
+                }
+                if (this.types[type].energy_action && j === 'attack'){
+                    max = b - 2;
+                } else {
+                    max = b - 1;
+                }
+                if (j === 'attack'){
+                    for (i=0; i < max; i++){
+                    debug(this.name,'Need to figure out array to build.')
+                    }
+                }
+		/*
+                if(this.data[uid][type].button_fail <= 5 || !this.data[uid][type].button_fail){
                     //Primary method of finding button.
                     //debug(this.name,"Setting Primary button location.");
                     j = (this.runtime.fortify && Queue.burn.energy >= 10) ? 'fortify' : 'attack';
@@ -767,12 +788,13 @@ Monster.work = function(state) {
                     log(this.name,'Ignoring Monster ' + this.data[uid][type].name + '\'s ' + this.types[type].name + this.data[uid][type] + ': Unable to locate ' + j + ' button ' + this.data[uid][type].button_fail + ' times!');
                     this.data[uid][type].ignore = true;
                     this.data[uid][type].button_fail = 0;}
+                */
 	}
 	if (!btn || !btn.length || (Page.page !== 'keep_monster_active' && Page.page !== 'keep_monster_active2') || ($('div[style*="dragon_title_owner"] img[linked]').attr('uid') != uid && $('div[style*="nm_top"] img[linked]').attr('uid') != uid)) {
-/*		debug(this.name,'Reloading page. Button = ' + btn.attr('name'));
+		debug(this.name,'Reloading page. Button = ' + btn.attr('name'));
                 debug(this.name,'Reloading page. Page.page = '+ Page.page);
                 debug(this.name,'Reloading page. Monster Owner UID is ' + $('div[style*="dragon_title_owner"] img[linked]').attr('uid') + ' Expecting UID : ' + uid);
-*/
+
 		Page.to(this.types[type].raid ? 'battle_raid' : 'keep_monster', '?user=' + uid + (this.types[type].mpool ? '&mpool='+this.types[type].mpool : ''));
 		return true; // Reload if we can't find the button or we're on the wrong page
 	}
