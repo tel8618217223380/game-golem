@@ -12,6 +12,12 @@ Need to recode how worker finds buttons to take into account new system released
  # Re-write system to use a dynamic list maintained in runtime, built using a trial / results method. (Worker clicks button and captures results).
     * Pro - Worker depends less on hard coding and can adapt to CA Dev changes on its own.
     * Con - Difficult to program. Golem will spend resources haphazardly to build list.
+=== Implementing Action ===
+HaploAW
+ * For ease of update, going with option 1 but making the option more dynamic.
+ * No longer rely on hard coded pictures. Now worker relies on hard coded list of available attacks.
+ * Worker can spend a variable amount of stamina on a single attack based on user input.
+
 
 =* Upgrade Worker *=
 
