@@ -294,7 +294,7 @@ Monster.types = {
         name:'Amethyst Sea Serpent',
         list:'seamonster_list_purple.jpg',
         image:'seamonster_purple.jpg',
-        //dead:'seamonster_dead.jpg',
+        dead:'seamonster_dead.jpg',
         achievement:100000,
         timer:259200, // 72 hours
         mpool:2,
@@ -306,7 +306,7 @@ Monster.types = {
         name:'Ancient Sea Serpent',
         list:'seamonster_list_red.jpg',
         image:'seamonster_red.jpg',
-        //dead:'seamonster_dead.jpg',
+        dead:'seamonster_dead.jpg',
         achievement:100000,
         timer:259200, // 72 hours
         mpool:2,
@@ -318,7 +318,7 @@ Monster.types = {
         name:'Emerald Sea Serpent',
         list:'seamonster_list_green.jpg',
         image:'seamonster_green.jpg',
-        //dead:'seamonster_dead.jpg',
+        dead:'seamonster_dead.jpg',
         achievement:100000,
         timer:259200, // 72 hours
         mpool:2,
@@ -330,7 +330,7 @@ Monster.types = {
         name:'Sapphire Sea Serpent',
         list:'seamonster_list_blue.jpg',
         image:'seamonster_blue.jpg',
-        //dead:'seamonster_dead.jpg',
+        dead:'seamonster_dead.jpg',
         achievement:100000,
         timer:259200, // 72 hours
         mpool:2,
@@ -793,9 +793,9 @@ Monster.update = function(what) {
         this.runtime.fortify = false;
         Dashboard.status(this, 'Nothing to do.');
     }
-    if (this.option.monster_del && this.data[i][j].state === 'complete'){
+    /*if (this.option.monster_del && this.data[i][j].state === 'complete'){
         $(' a[href^="http://apps.facebook.com/castle_age/battle_monster.php?remove_list="' + this.data[uid] + '&mpool='+ this.types[type].mpool + '"]').click;
-    }
+    }*/
 };
 
 Monster.work = function(state) {
