@@ -55,12 +55,10 @@ Emporium.parse = function(change) {
 	var prize_img=$('div[style*="emporium_pop_up"] div div img:not([src*="skip"])');
 	if(prize_img.length>0) {
 		var prize=prize_img.attr('src').filepart();
-		if(this.data.prizes[prize]) {
-			this.data.prizes[prize]++;
-		}
-		else {
+		if(!this.data.prizes[prize]) {
 			this.data.prizes[prize]=0;
 		}
+		this.data.prizes[prize]++;
 		debug(this.name, 'Prize '+prize);
 	}
 };
