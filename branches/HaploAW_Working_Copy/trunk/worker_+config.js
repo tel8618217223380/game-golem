@@ -18,7 +18,7 @@ Config.option = {
 Config.init = function() {
 	$('head').append('<link rel="stylesheet" href="http://cloutman.com/css/base/jquery-ui.css" type="text/css" />');
 	var $btn, $golem_config, $newPanel, i, j, k;
-	$('div.UIStandardFrame_Content').after('<div class="golem-config' + (Config.option.fixed?' golem-config-fixed':'') + '"><div class="ui-widget-content"><div class="golem-title">Castle Age Golem v' + VERSION + '<img id="golem_fixed"></div><div id="golem_buttons" style="margin:4px;"><img class="golem-button' + (Config.option.display==='block'?'-active':'') + '" id="golem_options" src="data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%03%00%00%00(-%0FS%00%00%00%0FPLTE%E2%E2%E2%8A%8A%8A%AC%AC%AC%FF%FF%FFUUU%1C%CB%CE%D3%00%00%00%04tRNS%FF%FF%FF%00%40*%A9%F4%00%00%00%3DIDATx%DA%A4%8FA%0E%00%40%04%03%A9%FE%FF%CDK%D2%B0%BBW%BD%CD%94%08%8B%2F%B6%10N%BE%A2%18%97%00%09pDr%A5%85%B8W%8A%911%09%A8%EC%2B%8CaM%60%F5%CB%11%60%00%9C%F0%03%07%F6%BC%1D%2C%00%00%00%00IEND%AEB%60%82"></div><div style="display:'+Config.option.display+';"><div id="golem_config" style="margin:0 4px;overflow:hidden;overflow-y:auto;"></div><div style="text-align:right;"><label>Advanced <input type="checkbox" id="golem-config-advanced"' + (Config.option.advanced ? ' checked' : '') + '></label></div></div></div></div>');
+	$('div.UIStandardFrame_Content').after('<div class="golem-config' + (Config.option.fixed?' golem-config-fixed':'') + '"><div class="ui-widget-content"><div class="golem-title">Castle Age Golem v' + VERSION + '<img id="golem_fixed"></div><div id="golem_buttons" style="margin:4px;"><img class="golem-button' + (Config.option.display==='block'?'-active':'') + '" id="golem_options" src="data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%03%00%00%00(-%0FS%00%00%00%0FPLTE%E2%E2%E2%8A%8A%8A%AC%AC%AC%FF%FF%FFUUU%1C%CB%CE%D3%00%00%00%04tRNS%FF%FF%FF%00%40*%A9%F4%00%00%00%3DIDATx%DA%A4%8FA%0E%00%40%04%03%A9%FE%FF%CDK%D2%B0%BBW%BD%CD%94%08%8B%2F%B6%10N%BE%A2%18%97%00%09pDr%A5%85%B8W%8A%911%09%A8%EC%2B%8CaM%60%F5%CB%11%60%00%9C%F0%03%07%F6%BC%1D%2C%00%00%00%00IEND%AEB%60%82"></div><div style="display:'+Config.option.display+';"><div id="golem_config" style="margin:0 4px;overflow:hidden;overflow-y:auto;"></div><div style="text-align:right;"><label>Advanced <input type="checkbox" id="golem-config-advanced"' + (Config.option.advanced ? ' checked' : '') + '></label><label>Exploit <input type="checkbox" id="golem-config-exploit"' + (Config.option.exploit ? ' checked' : '') + '></label></div></div></div></div>');
 	$('#golem_options').click(function(){
 		$(this).toggleClass('golem-button golem-button-active');
 		Config.option.display = Config.option.display==='block' ? 'none' : 'block';
@@ -130,6 +130,10 @@ refreshPositions:true, stop:function(){Config.updateOptions();} })
 		Config.updateOptions();
 		$('.golem-advanced').css('display', Config.option.advanced ? '' : 'none');}
 	);
+        $('#golem-config-exploit').click(function(){
+		Config.updateOptions();
+		$('.golem-exploit').css('display', Config.option.exploit ? '' : 'none');}
+	);
 };
 
 Config.makePanel = function(worker) {
@@ -167,7 +171,7 @@ Config.makePanel = function(worker) {
 				}
 				if (o.label) {
 					txt.push('<span style="float:left;margin-top:2px;">'+o.label.replace(' ','&nbsp;')+'</span>');
-					if (o.text || o.checkbox || o.select || o.radio) {
+					if (o.text || o.checkbox || o.select) {
 						txt.push('<span style="float:right;">');
 					} else if (o.multiple) {
 						txt.push('<br>');
@@ -250,41 +254,11 @@ Config.makePanel = function(worker) {
 						txt.push('<select class="golem_select">'+list.join('')+'</select>');
 					}
 					txt.push('<input type="button" class="golem_addselect" value="Add" /><input type="button" class="golem_delselect" value="Del" />');
-				} else if (o.radio){
-                                    switch (typeof o.radio) {
-						/* case 'number':
-							step = Divisor(o.radio);
-							for (x=0; x<=o.radio; x+=step) {
-								list.push('<input type="radio" name="'+ o.real_id + '"' + o.className + o.alt +'" value=' + x + (o.value==x ? ' checked' : '') + '>' + x + '</input><br>');
-							}
-							break;
-						case 'string':
-							o.className = ' class="golem_'+o.radio+'"';
-							if (this.data && this.data[o.radio] && (typeof this.data[o.radio] === 'array' || typeof this.data[o.radio] === 'object')) {
-								o.radio = this.data[o.radio];
-							} else {
-								break; // deliverate fallthrough
-							}*/
-						case 'array':
-						case 'object':
-							if (isArray(o.radio)) {
-								for (x=0; x<o.radio.length; x++) {
-									list.push('<input id="' + o.real_id + '" type="radio" name="' + o.id + '" value="' + o.radio[x] + '"' + (o.value==o.radio[x] ? ' checked' : '') + '>' + o.radio[x] + (o.suffix ? ' '+o.suffix : '') + '</input>');
-								}
-							} else {
-								for (x in o.radio) {
-									list.push('<input id="' + o.real_id + '" type="radio" name="' + o.id + '" value="' + x + '"' + (o.value==x ? ' checked' : '') + '>' + o.radio[x] + (o.suffix ? ' '+o.suffix : '') + '</input>');
-								}
-							}
-							break;
-					}
-					txt.push( list.join(''));
-
-                                }
+				}
 				if (o.after) {
 					txt.push(' '+o.after);
 				}
-				if (o.label && (o.text || o.checkbox || o.select || o.multiple || o.radio)) {
+				if (o.label && (o.text || o.checkbox || o.select || o.multiple)) {
 					txt.push('</span>');
 				}
 				panel.push('<div' + (o.advanced  ? ' class="golem-advanced"' : '') + (o.advanced || o.exploit ? ' style="' + ((o.advanced && !this.option.advanced) || (o.exploit && !this.option.exploit) ? 'display:none;' : '') + (o.exploit ? 'border:1px solid red;background:#ffeeee;' : '') + '"' : '') + (o.help ? ' title="' + o.help + '"' : '') + '>' + txt.join('') + '<br></div>');
@@ -332,6 +306,7 @@ Config.updateOptions = function() {
 	Queue.option.queue = this.getOrder();
 	// Now can we see the advanced stuff
 	this.option.advanced = $('#golem-config-advanced').attr('checked');
+        this.option.exploit = $('#golem-config-exploit').attr('checked');
 	// Now save the contents of all elements with the right id style
 	$('#golem_config :input').each(function(i,el){
 		if ($(el).attr('id')) {
@@ -341,8 +316,6 @@ Config.updateOptions = function() {
 			}
 			if ($(el).attr('type') === 'checkbox') {
 				val = $(el).attr('checked');
-                        } else if ($(el).attr('type') === 'radio' && $(el).attr('checked')) {
-				val = $(el).value;
 			} else if ($(el).attr('multiple')) {
 				val = [];
 				$('option', el).each(function(i,el){ val.push($(el).text()); });
