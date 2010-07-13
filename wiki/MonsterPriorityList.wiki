@@ -1,7 +1,8 @@
 #labels Featured
 When Monster - Attack - Stop is set to Priority List, a text box appears.  This box takes a string of comma or return separated words or phrases, and searches against the list of monsters you have available to decide what order to attack them in. 
 
-Step one  Define the monster(s) you wish to make setting(s) for
+==Step 1 -- Define the monster(s) you wish to make setting(s) for==
+
 You can define individual monsters by using your friends name or "your" for your own monsters. (NOT case sensitive.) Ex 
         james,
         bob,
@@ -12,7 +13,7 @@ Valid separators are line returns or commas.  For monsters of equal priority, a 
 
 You can also define which type of monster you want to set parameters for, such as "legion" or "serpent." To see the default achievement damage level for your monster, hover your cursor over the picture of the monster on the dashboard, and the achievement level damage will appear as a tooltip.
 
-NOTES
+====NOTES===
 
 1. All Monsters with a Fortify/Dispel/Defenses takes the total damage and total fortification into account towards your total damage on that monster. Example: If you have Skaar in achievement mode and you do 400k Dispel, you will only do 600k Damage. (1m total first pass for achievement
 
@@ -27,7 +28,7 @@ NOTES
 6. If you want multiple search terms to be sorted together, then you can use the "|" separator.  For example, if you have "serpent|dragon,legion", then the script will search for serpents or dragons first, and if it can't find any, then search for legions.
 
 
-Step 2  defining special conditions for your monster(s)
+==Step 2 -- defining special conditions for your monster(s)==
 
 After defining the name or monster type, there are a set of commands to apply actions with these monsters (note that these are case sensitive)
 
@@ -37,7 +38,7 @@ After defining the name or monster type, there are a set of commands to apply ac
 k = X1,000<br>
 m = X1,000,000<br>
 
-NOTES
+===NOTES===
 
 1) Basically, the scripts has two limits per monster - first pass ("achievement mode"Orange colored in Monster dashboard) and then it makes a second pass ("max damage"Red colored in Monster dashboard).
 
@@ -54,19 +55,16 @@ red dragon:max0   <-all red dragons ignored
 
 Examples and functions
 
-stallion:max0
-dragon:max200k|serpent:max500k
-legion:ach300:max500,
-ice:ach2m:f%90
+stallion:max0<br>
+dragon:max200k|serpent:max500k<br>
+legion:ach300:max500,<br>
+ice:ach2m:f%90<br>
 
 Summary of above functions.
 
-    Ignore stallion's monster, regardless of type
-
-    Attack dragons or serpents next, first pass-standard achievement for each monster, and then stop at 200k for dragons and 500k for serpents after all achievement levels done.
-
-    Attack Battle of the Dark Legion, first pass of new achievement amt 300 orcs (second pass max 500 orcs)
-
-    Attack Ragnorok the Ice Elemental, first pass of new achievement 2m (second pass unlimited max), and fortify if under 90% 
+  * Ignore stallion's monster, regardless of type
+  * Attack dragons or serpents next, first pass-standard achievement for each monster, and then stop at 200k for dragons and 500k for serpents after all achievement levels done.
+  * Attack Battle of the Dark Legion, first pass of new achievement amt 300 orcs (second pass max 500 orcs)
+  * Attack Ragnorok the Ice Elemental, first pass of new achievement 2m (second pass unlimited max), and fortify if under 90% 
 
 This page largely copied from guide from Stallion on Caap page!
