@@ -72,3 +72,5 @@ Summary of above functions.
     Attack Battle of the Dark Legion, first pass of new achievement amt 300 orcs (second pass max 500 orcs)
 
     Attack Ragnorok the Ice Elemental, first pass of new achievement 2m (second pass unlimited max), and fortify if under 90% 
+
+This page largely copied from guide from Stallion on Caap page!
