@@ -14,10 +14,9 @@ You can also define which type of monster you want to set parameters for, such a
 
 NOTES
 
-1) All Monsters with a Fortify/Dispel/Defenses takes the total damage and total fortification into account towards your total damage on that monster. Example 
+1 All Monsters with a Fortify/Dispel/Defenses takes the total damage and total fortification into account towards your total damage on that monster. Example 
 If you have Skaar in achievement mode and you do 400k Dispel, you will only do 600k Damage. (1m total first pass for achievement)
-
-2) Legion (Battle of the Dark Legion) works off total orcs killed. 1000 orcs is the achievement, not 1000k dmg.  Also, Legions ignore fortification for achievement or max, since total fortification is not displayed.
+2 Legion (Battle of the Dark Legion) works off total orcs killed. 1000 orcs is the achievement, not 1000k dmg.  Also, Legions ignore fortification for achievement or max, since total fortification is not displayed.
 
 3) facebook ids, urlix, and freshmeat have no use in battle monster order.
 
