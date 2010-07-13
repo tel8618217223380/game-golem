@@ -31,15 +31,11 @@ Step 2  defining special conditions for your monster(s)
 
 After defining the name or monster type, there are a set of commands to apply actions with these monsters (note that these are case sensitive)
 
-:ach500k - use 500,000 damage as the achievement level for a match against this word, instead of the default
-
-:max1m - after 1,000,000 damage against a match for this word, do not attack this monster any more
-
-:f%50 - override the control panel Fortify if Percentage Over setting with 50% for this monster
-
-k = X1,000
-
-m = X1,000,000
+:ach500k - use 500,000 damage as the achievement level for a match against this word, instead of the default<br>
+:max1m - after 1,000,000 damage against a match for this word, do not attack this monster any more<br>
+:f%50 - override the control panel Fortify if Percentage Over setting with 50% for this monster<br>
+k = X1,000<br>
+m = X1,000,000<br>
 
 NOTES
 
