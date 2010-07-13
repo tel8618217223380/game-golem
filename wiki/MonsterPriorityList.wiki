@@ -14,17 +14,18 @@ You can also define which type of monster you want to set parameters for, such a
 
 NOTES
 
-1 All Monsters with a Fortify/Dispel/Defenses takes the total damage and total fortification into account towards your total damage on that monster. Example 
-If you have Skaar in achievement mode and you do 400k Dispel, you will only do 600k Damage. (1m total first pass for achievement)
-2 Legion (Battle of the Dark Legion) works off total orcs killed. 1000 orcs is the achievement, not 1000k dmg.  Also, Legions ignore fortification for achievement or max, since total fortification is not displayed.
+1. All Monsters with a Fortify/Dispel/Defenses takes the total damage and total fortification into account towards your total damage on that monster. Example: If you have Skaar in achievement mode and you do 400k Dispel, you will only do 600k Damage. (1m total first pass for achievement
 
-3) facebook ids, urlix, and freshmeat have no use in battle monster order.
+2. Legion (Battle of the Dark Legion) works off total orcs killed. 1000 orcs is the achievement, not 1000k dmg.  Also, Legions ignore fortification for achievement or max, since total fortification is not displayed.
 
-4) To "attack them all" set "Priority List" then do not type anything into the box. Golem will attack each in order up to Achievement level. Then proceed to attack the first monster on your list with no limit.
+3. facebook ids, urlix, and freshmeat have no use in battle monster order.
 
-5) If multiple monsters match the same search term, such as when you have multiple serpents and the search term "serpents", then the script will pick which one to start with according to your attack setting.  For example, if you had Attack set to "Shortest ETD", then it would attack the serpent with the shortest ETD first.
+4. To "attack them all" set "Priority List" then do not type anything into the box. Golem will attack each in order up to Achievement level. Then proceed to attack the first monster on your list with no limit.
 
-6) If you want multiple search terms to be sorted together, then you can use the "|" separator.  For example, if you have "serpent|dragon,legion", then the script will search for serpents or dragons first, and if it can't find any, then search for legions.
+5. If multiple monsters match the same search term, such as when you have multiple serpents and the search term "serpents", then the script will pick which one to start with according to your attack setting.  For example, if you had Attack set to "Shortest ETD", then it would attack the serpent with the shortest ETD first.
+
+6. If you want multiple search terms to be sorted together, then you can use the "|" separator.  For example, if you have "serpent|dragon,legion", then the script will search for serpents or dragons first, and if it can't find any, then search for legions.
+
 
 Step 2  defining special conditions for your monster(s)
 
