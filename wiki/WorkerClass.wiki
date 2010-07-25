@@ -42,9 +42,11 @@ myWorker.parse = function(change) {
 };
 
 myWorker.work = function(state) {
+   // this .data is not available
    if (!state) {
       return true; // Check if we need to work and return true if we do, otherwise return false
    }
+   // this.data is now available
    return false; // Change to true and let the check at the top decide if we keep focus
 };
 
@@ -60,11 +62,14 @@ Flow occurs like so -
 || .init() || true || The only time all workers .data is directly available ||
 || .parse(false) || true || Must never change the page, must return true if that is needed ||
 || .parse(true) || true || Can change the page, only called if .parse(false) returned true ||
-|| .work(false) || false || Decide if we need focus, return true if we do, but doesn't guarantee we get it ||
-|| .work(true) || true || We have focus, do anything you like, don't return false till finished ||
-|| .update('data') || true || Our data is about to be saved as something changed. This is the best place to create the state data and decide if we want to work later ||
-|| .update('option') || true || As above, only the options have changed ||
-|| .update(worker) || true || Special state (see `_`watch() below) ||
+|| .work(false) || false || Decide if we need focus, return true if we do, but doesn't guarantee we get it. At this point .data is null ||
+|| .work(true) || true || We have focus, do anything you like, don't return false till finished. At this point .data is available ||
+|| .update(null,null) || true || This is only called once called after init() so is a good time to update any runtime variables ||
+|| .update('data',null) || true || Our data is about to be saved as something changed. This is the best place to create the state data and decide if we want to work later ||
+|| .update('option',null) || true || As above, only .options has changed ||
+|| .update('runtime',null) || true || As above, only .runtime has changed ||
+|| .update('reminder',null) || true || We've asked for a `_`remind() or `_`revive() and are being reminded ||
+|| .update(`*`, worker) || true || A worker we are `_`watch()'ing has had something change (types as above). When worker is null it always means ourselves. ||
 || .dashboard() || true || Called from worker_dashboard. See other source files for examples ||
 
 
@@ -73,6 +78,14 @@ Flow occurs like so -
 == this.`_`changed ==
 
 The time of the last change to our data in milliseconds, same as Date.now().
+
+== this.`_`remind(seconds) ==
+
+After a delay calls _worker_.`_`update('reminder',null) once.
+
+== this.`_`revive(seconds) ==
+
+Every xx seconds calls _worker_.`_`update('reminder',null).
 
 == this.`_`watch(_worker_) ==
 
