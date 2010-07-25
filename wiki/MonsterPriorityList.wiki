@@ -13,9 +13,9 @@ Valid separators are line returns or commas.  For monsters of equal priority, a 
 
 One special divider is "levelup."  This can be used to separate normal priority list with special conditions you want used for when you are need to burn energy/stamina to level up.  For example:
 
-dragon:max200k
-levelup
-dragon:max400k
+dragon:max200k<br>
+levelup<br>
+dragon:max400k<br>
 
 First, all terms before "levelup" are parsed, whether in level up mode or not.  Then if not in level up mode, no further commands are parsed.  If in level up mode, then all previous matches are forgotten, and it begins parsing from after the levelup command again.
 
