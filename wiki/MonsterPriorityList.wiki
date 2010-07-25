@@ -11,6 +11,14 @@ You can define individual monsters by using your friends name or "your" for your
 
 Valid separators are line returns or commas.  For monsters of equal priority, a "|" character can also be used.  See Note 6 below.
 
+One special divider is "levelup."  This can be used to separate normal priority list with special conditions you want used for when you are need to burn energy/stamina to level up.  For example:
+
+dragon:max200k
+levelup
+dragon:max400k
+
+First, all terms before "levelup" are parsed, whether in level up mode or not.  Then if not in level up mode, no further commands are parsed.  If in level up mode, then all previous matches are forgotten, and it begins parsing from after the levelup command again.
+
 You can also define which type of monster you want to set parameters for, such as "legion" or "serpent." To see the default achievement damage level for your monster, hover your cursor over the picture of the monster on the dashboard, and the achievement level damage will appear as a tooltip.
 
 ====NOTES===
@@ -35,6 +43,8 @@ After defining the name or monster type, there are a set of commands to apply ac
 :ach500k - use 500,000 damage as the achievement level for a match against this word, instead of the default<br>
 :max1m - after 1,000,000 damage against a match for this word, do not attack this monster any more<br>
 :f%50 - override the control panel Fortify if Percentage Over setting with 50% for this monster<br>
+:sec - Make secondary attacks against this monster like deflect or cripple even if the monster is over achievement or max damage
+:ac - automatically collect the rewards from this monster
 k = X1,000<br>
 m = X1,000,000<br>
 
@@ -56,15 +66,15 @@ red dragon:max0   <-all red dragons ignored
 Examples and functions
 
 stallion:max0<br>
-dragon:max200k|serpent:max500k<br>
-legion:ach300:max500,<br>
-ice:ach2m:f%90<br>
+dragon:max200k|serpent:max500k:ac<br>
+legion:ach300:max500:f%0,<br>
+azriel:ach2m:f%90:sec<br>
 
 Summary of above functions.
 
-  * Ignore stallion's monster, regardless of type
-  * Attack dragons or serpents next, first pass-standard achievement for each monster, and then stop at 200k for dragons and 500k for serpents after all achievement levels done.
-  * Attack Battle of the Dark Legion, first pass of new achievement amt 300 orcs (second pass max 500 orcs)
-  * Attack Ragnorok the Ice Elemental, first pass of new achievement 2m (second pass unlimited max), and fortify if under 90% 
+  * Ignore stallion's monsters, regardless of type
+  * Attack dragons or serpents next, first pass-standard achievement for each monster, and then stop at 200k for dragons and 500k for serpents after all achievement levels done.  Automatically collect rewards.
+  * Attack Battle of the Dark Legion, first pass of new achievement amt 300 orcs (second pass max 500 orcs), and don't fortify ever
+  * Attack Azriel, first pass of new achievement 2m (second pass unlimited max), and fortify if under 90%.  Always do secondary attacks like cripple or deflect even if over achivement.
 
 This page largely copied from guide from Stallion on Caap page!
