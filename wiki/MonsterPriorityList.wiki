@@ -43,14 +43,14 @@ After defining the name or monster type, there are a set of commands to apply ac
 :ach500k - use 500,000 damage as the achievement level for a match against this word, instead of the default<br>
 :max1m - after 1,000,000 damage against a match for this word, do not attack this monster any more<br>
 :f%50 - override the control panel Fortify if Percentage Over setting with 50% for this monster<br>
-:sec - Make secondary attacks against this monster like deflect or cripple even if the monster is over achievement or max damage
-:ac - automatically collect the rewards from this monster
+:sec - Make secondary attacks against this monster like deflect or cripple even if the monster is over achievement or max damage<br>
+:ac - automatically collect the rewards from this monster<br>
 k = X1,000<br>
 m = X1,000,000<br>
 
 ===NOTES===
 
-1) Basically, the scripts has two limits per monster - first pass ("achievement mode"Orange colored in Monster dashboard) and then it makes a second pass ("max damage"Red colored in Monster dashboard).
+1) Basically, the scripts has two limits per monster - first pass ("achievement mode": Orange colored in Monster dashboard) and then it makes a second pass ("max damage": Red colored in Monster dashboard).
 
 2) Once a match has been found for a specific monster, all other matches after that will be ignored for that monster.  If Dave has a red dragon, and your list has "dave:ach50k, dragon:max100k" the script will only use the achievement level of 50k and ignore the max, since it matched dave first.
 
