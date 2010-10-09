@@ -1,5 +1,5 @@
 #summary Golem on Castle Age
-#labels CastleAge
+#labels CastleAge,Phase-Documentation
 
 = Introduction =
 
