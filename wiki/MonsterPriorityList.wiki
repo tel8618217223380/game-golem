@@ -47,6 +47,8 @@ After defining the name or monster type, there are a set of commands to apply ac
 :ac - automatically collect the rewards from this monster<br>
 k = X1,000<br>
 m = X1,000,000<br>
+:minpa#:maxpa#<br>
+:achpa#<br>
 
 ===NOTES===
 
@@ -63,12 +65,15 @@ red dragon:max0   <-all red dragons ignored
 
 5) If you have a problem with Asian/special characters you can 'trick' golem into attacking them last by setting the requirements for all other monsters.  Also, Asian/special characters can be copy/pasted into the golem Attack Order.
 
+6) With regards to PA attacks: a sort of hack for PA limits in the Priority List code. Use :achpa### and :maxpa### for those. Note that this really doesn't limit it to exact attacks, but does a guess, the same way Golem guesses how many PAs you had in the first place. It maps that into a achievement and max damage pair. I'd suggest if you want something like 50 PAs, use :minpa50:maxpa55 to ensure you are in the right ballpark. A good string of crit hits might lower the real count of hits you've done.
+
 Examples and functions
 
 stallion:max0<br>
 dragon:max200k|serpent:max500k:ac<br>
 legion:ach300:max500:f%0,<br>
 azriel:ach2m:f%90:sec<br>
+keira:minpa20:maxpa25<br>
 
 Summary of above functions.
 
@@ -76,5 +81,6 @@ Summary of above functions.
   * Attack dragons or serpents next, first pass-standard achievement for each monster, and then stop at 200k for dragons and 500k for serpents after all achievement levels done.  Automatically collect rewards.
   * Attack Battle of the Dark Legion, first pass of new achievement amt 300 orcs (second pass max 500 orcs), and don't fortify ever
   * Attack Azriel, first pass of new achievement 2m (second pass unlimited max), and fortify if under 90%.  Always do secondary attacks like cripple or deflect even if over achivement.
+  * Attack Keira around 20 to 25 times based on Golem's damage calculation
 
 This page largely copied from guide from Stallion on Caap page!
